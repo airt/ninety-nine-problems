@@ -2,6 +2,7 @@
 import Test.HUnit
 import H_99.H_01_10
 import H_99.H_11_20
+import H_99.H_21_28
 
 test01 = TestCase $ assertEqual "myLast"
   9
@@ -87,8 +88,21 @@ test20 = TestCase $ assertEqual "removeAt"
   ('b',"acd")
   $ removeAt 2 "abcd"
 
+test21 = TestCase $ assertEqual "insertAt"
+  "aXbcd"
+  $ insertAt 'X' "abcd" 2
+
+test22 = TestCase $ assertEqual "range"
+  [4,5,6,7,8,9]
+  $ range 4 9
+
+test28 = TestCase $ assertEqual "lsort"
+  ["o","de","de","mn","abc","fgh","ijkl"]
+  $ lsort ["abc","de","fgh","de","ijkl","mn","o"]
+
 tests = TestList
   [test01, test02, test03, test04, test05,
    test06, test07, test08, test09, test10,
    test11, test12, test13, test14, test15,
-   test16, test17, test18, test19, test20]
+   test16, test17, test18, test19, test20,
+   test21, test22, test28]
