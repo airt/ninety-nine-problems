@@ -67,7 +67,7 @@ Prelude> elementAt "haskell" 5
 'e'
 -}
 
-elementAt :: [a] -> Int -> a
+elementAt :: (Integral b) => [a] -> b -> a
 elementAt []     n = error "elementAt: index out of bounds"
 elementAt (x:xs) 1 = x
 elementAt (x:xs) n = elementAt xs (n - 1)
@@ -138,6 +138,8 @@ We have to define a new data type, because lists in Haskell are homogeneous.
 -}
 
 data NestedList a = Elem a | List [NestedList a]
+  deriving (Show, Read)
+
 flatten :: NestedList a -> [a]
 flatten (Elem x)      = [x]
 flatten (List [])     = []

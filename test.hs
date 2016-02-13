@@ -97,8 +97,10 @@ test22 = TestCase $ assertEqual "range"
   $ range 4 9
 
 test28 = TestCase $ assertEqual "lsort"
-  ["o","de","de","mn","abc","fgh","ijkl"]
-  $ lsort ["abc","de","fgh","de","ijkl","mn","o"]
+  (["o","de","de","mn","abc","fgh","ijkl"],
+   ["ijkl","o","abc","fgh","de","de","mn"])
+  $ (lsort ["abc","de","fgh","de","ijkl","mn","o"],
+     lfsort ["abc","de","fgh","de","ijkl","mn","o"])
 
 tests = TestList
   [test01, test02, test03, test04, test05,

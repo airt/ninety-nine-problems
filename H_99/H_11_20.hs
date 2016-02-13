@@ -17,6 +17,7 @@ module H_99.H_11_20
 ) where
 
 import H_99.H_01_10
+import Data.List
 
 {-
 11. Modified run-length encoding.
@@ -35,7 +36,7 @@ P11> encodeModified "aaaabccaadeeee"
 -}
 
 data Elem a = Single a | Multiple Int a
-  deriving (Eq, Show)
+  deriving (Eq, Show, Read)
 
 encodeModified :: (Eq a) => [a] -> [Elem a]
 encodeModified xs = map f . encode $ xs
@@ -58,7 +59,7 @@ P12> decodeModified
 decodeModified :: (Eq a) => [Elem a] -> [a]
 decodeModified [] = []
 decodeModified ((Single y):xs) = [y] ++ decodeModified xs
-decodeModified ((Multiple n y):xs) = replicate n y ++ decodeModified xs
+decodeModified ((Multiple n y):xs) = genericReplicate n y ++ decodeModified xs
 
 {-
 13. Run-length encoding of a list (direct solution).
@@ -114,8 +115,8 @@ Example in Haskell:
 "aaabbbccc"
 -}
 
-repli :: [a] -> Int -> [a]
-repli xs n = concatMap (replicate n) xs
+repli :: (Integral b) => [a] -> b -> [a]
+repli xs n = concatMap (genericReplicate n) xs
 
 {-
 16. Drop every N'th element from a list.
@@ -129,7 +130,7 @@ Example in Haskell:
 "abdeghk"
 -}
 
-dropEvery :: [a] -> Int -> [a]
+dropEvery :: (Integral b) => [a] -> b -> [a]
 dropEvery xs n = map snd . filter ((/=0) . (`mod`n) . fst) . zip [1..] $ xs
 
 {-
@@ -145,7 +146,7 @@ Example in Haskell:
 ("abc", "defghik")
 -}
 
-split :: [a] -> Int -> ([a], [a])
+split :: (Integral b) => [a] -> b -> ([a], [a])
 split xs n = foldr f ([], []) . zip [1..] $ xs
   where
     f (i,x) (ys,zs)
@@ -167,8 +168,8 @@ Example in Haskell:
 "cdefg"
 -}
 
-slice :: [a] -> Int -> Int -> [a]
-slice xs i k = take (k - i + 1) . drop (i - 1) $ xs
+slice :: (Integral b) => [a] -> b -> b -> [a]
+slice xs i k = genericTake (k - i + 1) . genericDrop (i - 1) $ xs
 
 {-
 19. Rotate a list N places to the left.
@@ -187,10 +188,10 @@ Examples in Haskell:
 "ghabcdef"
 -}
 
-rotate :: [a] -> Int -> [a]
+rotate :: (Integral b) => [a] -> b -> [a]
 rotate xs n = b ++ a
   where
-    (a, b) = split xs $ mod n $ length xs
+    (a, b) = split xs . mod n . fromIntegral . length $ xs
 
 {-
 20. Remove the K'th element from a list.
@@ -211,7 +212,7 @@ Example in Haskell:
 ('b',"acd")
 -}
 
-removeAt :: Int -> [a] -> (a, [a])
+removeAt :: (Integral b) => b -> [a] -> (a, [a])
 removeAt k xs = foldr f (head xs, []) . zip [1..] $ xs
   where
     f (i,x) (z,zs)

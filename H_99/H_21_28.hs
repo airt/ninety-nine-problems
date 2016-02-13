@@ -6,8 +6,10 @@ module H_99.H_21_28
 ( insertAt
 , range
 , lsort
+, lfsort
 ) where
 
+import Data.Function
 import Data.List
 
 {-
@@ -22,10 +24,10 @@ P21> insertAt 'X' "abcd" 2
 "aXbcd"
 -}
 
-insertAt :: a -> [a] -> Int -> [a]
+insertAt :: (Integral b) => a -> [a] -> b -> [a]
 insertAt x xs n = ys ++ (x : zs)
   where
-    (ys,zs) = splitAt (n - 1) xs
+    (ys,zs) = genericSplitAt (n - 1) xs
 
 {-
 22. Create a list containing all integers within a given range.
@@ -153,7 +155,7 @@ Example:
 
 Example in Haskell:
 Prelude>lsort ["abc","de","fgh","de","ijkl","mn","o"]
-Prelude>["o","de","de","mn","abc","fgh","ijkl"]-
+Prelude>["o","de","de","mn","abc","fgh","ijkl"]
 
 b) Again, we suppose that a list contains elements that are lists themselves.
 But this time the objective is to sort the elements of this list according to
@@ -172,4 +174,9 @@ lfsort ["abc", "de", "fgh", "de", "ijkl", "mn", "o"]
 -}
 
 lsort :: [[a]] -> [[a]]
-lsort xs = sortOn length xs
+lsort xss = sortOn length xss
+
+lfsort :: [[a]] -> [[a]]
+lfsort xss = sortOn (freq . length) xss
+  where
+    freq len = length . filter ((==len) . length) $ xss
