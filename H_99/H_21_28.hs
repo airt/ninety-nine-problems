@@ -5,6 +5,8 @@
 module H_99.H_21_28
 ( insertAt
 , range
+, combinations
+, group'
 , lsort
 , lfsort
 ) where
@@ -72,7 +74,6 @@ Prelude System.Random>diff_select 6 49
 Prelude System.Random>[23,1,17,33,21,37]
 -}
 
-
 {-
 25. Generate a random permutation of the elements of a list.
 
@@ -102,6 +103,12 @@ Example in Haskell:
 > combinations 3 "abcdef"
 ["abc","abd","abe",...]
 -}
+
+combinations :: (Integral a) => a -> [b] -> [[b]]
+combinations 0 _  = [[]]
+combinations n xs = concatMap f . filter (not . null) . tails $ xs
+  where
+    f (y:ys) = map (y:) . combinations (n - 1) $ ys
 
 {-
 27. Group the elements of a set into disjoint subsets.
@@ -141,6 +148,12 @@ P27> group [2,3,4] ["aldo","beat","carla","david","evi",
 [[["aldo","beat"],["carla","david"],["evi","flip","gary","hugo","ida"]],...]
 (altogether 756 solutions)
 -}
+
+group' :: (Integral a, Eq b) => [a] -> [b] -> [[[b]]]
+group' [] _ = [[]]
+group' (n:ns) xs = concatMap f . combinations n $ xs
+  where
+    f ys = map (ys:) . group' ns $ (xs \\ ys)
 
 {-
 28. Sorting a list of lists according to length of sublists
