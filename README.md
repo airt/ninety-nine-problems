@@ -8,6 +8,7 @@ Some of the solutions for [H-99: Ninety-Nine Haskell Problems](https://wiki.hask
 
 ### Update
 
-26 to 41 (2016-01-14)
-11 to 22 (2016-01-12)
-01 to 10 (2016-01-11)
++  46 - 50 (2016-01-15)
++  26 - 41 (2016-01-14)
++  11 - 22 (2016-01-12)
++  01 - 10 (2016-01-11)

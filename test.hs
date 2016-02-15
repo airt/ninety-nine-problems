@@ -4,6 +4,7 @@ import H_99.H_01_10
 import H_99.H_11_20
 import H_99.H_21_28
 import H_99.H_31_41
+import H_99.H_46_50
 
 test01 = TestCase $ assertEqual "myLast"
   9
@@ -159,6 +160,39 @@ test41 = TestCase $ assertEqual "goldbachList"
   [(3,7),(5,7),(3,11),(3,13),(5,13),(3,17)]
   $ goldbachList 9 20
 
+test46 = TestCase $ assertEqual "table"
+  [[True ,True ,True ],
+   [True ,False,True ],
+   [False,True ,False],
+   [False,False,False]]
+  $ table (\a b -> (and' a (or' a b)))
+
+test47 = TestCase $ assertEqual "table2"
+  [[True ,True ,True ],
+   [True ,False,True ],
+   [False,True ,False],
+   [False,False,False]]
+  $ table (\a b -> a `and'` (a `or'` not b))
+
+test48 = TestCase $ assertEqual "tablen"
+  [[True ,True ,True ,True],
+   [True ,True ,False,True],
+   [True ,False,True ,True],
+   [True ,False,False,True],
+   [False,True ,True ,True],
+   [False,True ,False,True],
+   [False,False,True ,True],
+   [False,False,False,True]]
+  $ tablen 3 (\[a,b,c] -> a`and'`(b`or'`c)`equ'`a`and'`b`or'`a`and'`c)
+
+test49 = TestCase $ assertEqual "gray"
+  ["000","001","011","010","110","111","101","100"]
+  $ gray 3
+
+test50 = TestCase $ assertEqual "huffman"
+  [('a',"0"),('b',"101"),('c',"100"),('d',"111"),('e',"1101"),('f',"1100")]
+  $ huffman [('a',45),('b',13),('c',12),('d',16),('e',9),('f',5)]
+
 tests =
   [test01, test02, test03, test04, test05,
    test06, test07, test08, test09, test10,
@@ -167,7 +201,8 @@ tests =
    test21, test22, test26, test27, test28,
    test31, test32, test33, test34, test35,
    test36, test37, test38, test39, test40,
-   test41]
+   test41, test46, test47, test48, test49,
+   test50]
 
 testlist = TestList tests
 
