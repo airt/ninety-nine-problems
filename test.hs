@@ -5,6 +5,7 @@ import H_99.H_11_20
 import H_99.H_21_28
 import H_99.H_31_41
 import H_99.H_46_50
+import H_99.H_54_60
 
 test01 = TestCase $ assertEqual "myLast"
   9
@@ -193,6 +194,45 @@ test50 = TestCase $ assertEqual "huffman"
   [('a',"0"),('b',"101"),('c',"100"),('d',"111"),('e',"1101"),('f',"1100")]
   $ huffman [('a',45),('b',13),('c',12),('d',16),('e',9),('f',5)]
 
+test55 = TestCase $ assertEqual "cbalTree"
+  [ Branch 'x' (Branch 'x' Empty Empty)
+               (Branch 'x' Empty
+                           (Branch 'x' Empty Empty))
+  , Branch 'x' (Branch 'x' Empty Empty)
+               (Branch 'x' (Branch 'x' Empty Empty)
+                           Empty)
+  , Branch 'x' (Branch 'x' Empty
+                           (Branch 'x' Empty Empty))
+               (Branch 'x' Empty Empty)
+  , Branch 'x' (Branch 'x' (Branch 'x' Empty Empty)
+                           Empty)
+               (Branch 'x' Empty Empty)
+  ]
+  $ cbalTree 4
+
+test56 = TestCase $ assertEqual "symmetric"
+  (True,False)
+  $ (symmetric (Branch 'x' (Branch 'x' Empty Empty)
+                           (Branch 'x' Empty Empty)),
+     symmetric (Branch 'x' (Branch 'x' Empty Empty) Empty))
+
+test57 = TestCase $ assertEqual "construct"
+  (Branch 3 (Branch 2 (Branch 1 Empty Empty) Empty)
+            (Branch 5 Empty (Branch 7 Empty Empty)),
+   True,
+   True)
+  $ (construct [3, 2, 5, 7, 1],
+     symmetric . construct $ [5, 3, 18, 1, 4, 12, 21],
+     symmetric . construct $ [3, 2, 5, 7, 1])
+
+test58 = TestCase $ assertEqual "symCbalTrees"
+  [ Branch 'x' (Branch 'x' Empty (Branch 'x' Empty Empty))
+               (Branch 'x' (Branch 'x' Empty Empty) Empty)
+  , Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty)
+               (Branch 'x' Empty (Branch 'x' Empty Empty))
+  ]
+  $ symCbalTrees 5
+
 tests =
   [test01, test02, test03, test04, test05,
    test06, test07, test08, test09, test10,
@@ -202,7 +242,7 @@ tests =
    test31, test32, test33, test34, test35,
    test36, test37, test38, test39, test40,
    test41, test46, test47, test48, test49,
-   test50]
+   test50, test55, test56, test57, test58]
 
 testlist = TestList tests
 

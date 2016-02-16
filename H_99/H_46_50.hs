@@ -3,8 +3,7 @@
 --https://wiki.haskell.org/99_questions/46_to_50
 
 module H_99.H_46_50
-( Htree(..)
-, and'
+( and'
 , or'
 , nand'
 , nor'
