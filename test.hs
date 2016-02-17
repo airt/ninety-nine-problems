@@ -6,6 +6,7 @@ import H_99.H_21_28
 import H_99.H_31_41
 import H_99.H_46_50
 import H_99.H_54_60
+import H_99.H_61_69
 
 test01 = TestCase $ assertEqual "myLast"
   9
@@ -233,6 +234,42 @@ test58 = TestCase $ assertEqual "symCbalTrees"
   ]
   $ symCbalTrees 5
 
+tree5 = Branch 'a' (Branch 'b' Empty (Branch 'd' Empty Empty))
+                   (Branch 'c' (Branch 'e' Empty Empty) Empty)
+
+test61 = TestCase $ assertEqual "countLeaves, leaves"
+  (2, ['d', 'e'])
+  $ (countLeaves tree5, leaves tree5)
+
+test62 = TestCase $ assertEqual "internals, atLevel"
+  (['a', 'b', 'c'], ['b', 'c'])
+  $ (internals tree5, atLevel tree5 2)
+
+test63 = TestCase $ assertEqual "completeBinaryTree, isCompleteBinaryTree"
+  (Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty)
+              (Branch 'x' Empty Empty),
+   True)
+  $ (completeBinaryTree 4, isCompleteBinaryTree . completeBinaryTree $ 4)
+
+test64 = TestCase $ assertEqual "layout"
+  (Branch ('a',(3,1)) (Branch ('b',(1,2)) Empty
+                                          (Branch ('d',(2,3)) Empty Empty))
+                      (Branch ('c',(5,2)) (Branch ('e',(4,3)) Empty Empty)
+                                          Empty))
+  $ layout tree5
+
+test67 = TestCase $ assertEqual "treeToString, stringToTree"
+  ("a(b(,d),c(e,))", Just tree5)
+  $ (treeToString tree5, stringToTree "a(b(,d),c(e,))")
+
+test68 = TestCase $ assertEqual "preorder, inorder"
+  ("abdce", "bdaec")
+  $ (preorder tree5, inorder tree5)
+
+test69 = TestCase $ assertEqual "tree2ds, ds2tree"
+  ("ab.d..ce...", Just tree5)
+  $ (tree2ds tree5, ds2tree "ab.d..ce...")
+
 tests =
   [test01, test02, test03, test04, test05,
    test06, test07, test08, test09, test10,
@@ -242,7 +279,9 @@ tests =
    test31, test32, test33, test34, test35,
    test36, test37, test38, test39, test40,
    test41, test46, test47, test48, test49,
-   test50, test55, test56, test57, test58]
+   test50, test55, test56, test57, test58,
+   test61, test62, test63, test64, test67,
+   test68, test69]
 
 testlist = TestList tests
 

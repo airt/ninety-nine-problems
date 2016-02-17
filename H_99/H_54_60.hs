@@ -3,14 +3,14 @@
 --https://wiki.haskell.org/99_questions/54A_to_60
 
 module H_99.H_54_60
-( Tree(..)
+( Btree(..)
 , cbalTree
 , symmetric
 , construct
 , symCbalTrees
 ) where
 
-data Tree a = Empty | Branch a (Tree a) (Tree a)
+data Btree a = Empty | Branch a (Btree a) (Btree a)
   deriving (Eq, Show, Read)
 
 {-
@@ -90,7 +90,7 @@ whitespace and "comment diagrams" added for clarity and exposition:
 ]
 -}
 
-cbalTree :: (Integral a) => a -> [Tree Char]
+cbalTree :: (Integral a) => a -> [Btree Char]
 cbalTree 0 = [Empty]
 cbalTree n =
   if m == 0
@@ -121,12 +121,12 @@ False
 True
 -}
 
-mirror :: Tree a -> Tree a -> Bool
+mirror :: Btree a -> Btree a -> Bool
 mirror Empty Empty = True
 mirror (Branch _ xl xr) (Branch _ yl yr) = mirror xl yr && mirror xr yl
 mirror _ _ = False
 
-symmetric :: Tree a -> Bool
+symmetric :: Btree a -> Bool
 symmetric Empty = True
 symmetric (Branch _ l r) = mirror l r
 
@@ -158,14 +158,14 @@ True
 True
 -}
 
-add :: (Ord a) => a -> Tree a -> Tree a
+add :: (Ord a) => a -> Btree a -> Btree a
 add x Empty = Branch x Empty Empty
 add x t@(Branch y l r)
   | x < y     = Branch y (add x l) r
   | x > y     = Branch y l (add x r)
   | otherwise = t
 
-construct :: (Ord a) => [a] -> Tree a
+construct :: (Ord a) => [a] -> Btree a
 construct xs = foldr add Empty . reverse $ xs
 
 {-
@@ -188,7 +188,7 @@ Example in Haskell:
 ]
 -}
 
-symCbalTrees :: (Integral a) => a -> [Tree Char]
+symCbalTrees :: (Integral a) => a -> [Btree Char]
 symCbalTrees n = filter symmetric . cbalTree $ n
 
 {-
