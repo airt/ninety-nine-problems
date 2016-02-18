@@ -7,6 +7,7 @@ import H_99.H_31_41
 import H_99.H_46_50
 import H_99.H_54_60
 import H_99.H_61_69
+import H_99.H_70_73
 
 test01 = TestCase $ assertEqual "myLast"
   9
@@ -234,16 +235,16 @@ test58 = TestCase $ assertEqual "symCbalTrees"
   ]
   $ symCbalTrees 5
 
-tree5 = Branch 'a' (Branch 'b' Empty (Branch 'd' Empty Empty))
-                   (Branch 'c' (Branch 'e' Empty Empty) Empty)
+btree5 = Branch 'a' (Branch 'b' Empty (Branch 'd' Empty Empty))
+                    (Branch 'c' (Branch 'e' Empty Empty) Empty)
 
 test61 = TestCase $ assertEqual "countLeaves, leaves"
   (2, ['d', 'e'])
-  $ (countLeaves tree5, leaves tree5)
+  $ (countLeaves btree5, leaves btree5)
 
 test62 = TestCase $ assertEqual "internals, atLevel"
   (['a', 'b', 'c'], ['b', 'c'])
-  $ (internals tree5, atLevel tree5 2)
+  $ (internals btree5, atLevel btree5 2)
 
 test63 = TestCase $ assertEqual "completeBinaryTree, isCompleteBinaryTree"
   (Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty)
@@ -256,19 +257,40 @@ test64 = TestCase $ assertEqual "layout"
                                           (Branch ('d',(2,3)) Empty Empty))
                       (Branch ('c',(5,2)) (Branch ('e',(4,3)) Empty Empty)
                                           Empty))
-  $ layout tree5
+  $ layout btree5
 
 test67 = TestCase $ assertEqual "treeToString, stringToTree"
-  ("a(b(,d),c(e,))", Just tree5)
-  $ (treeToString tree5, stringToTree "a(b(,d),c(e,))")
+  ("a(b(,d),c(e,))", Just btree5)
+  $ (treeToString btree5, stringToTree "a(b(,d),c(e,))")
 
 test68 = TestCase $ assertEqual "preorder, inorder"
   ("abdce", "bdaec")
-  $ (preorder tree5, inorder tree5)
+  $ (preorder btree5, inorder btree5)
 
 test69 = TestCase $ assertEqual "tree2ds, ds2tree"
-  ("ab.d..ce...", Just tree5)
-  $ (tree2ds tree5, ds2tree "ab.d..ce...")
+  ("ab.d..ce...", Just btree5)
+  $ (tree2ds btree5, ds2tree "ab.d..ce...")
+
+mtree7 =
+  Tnode 'a' [ Tnode 'b' [Tnode 'c' []]
+            , Tnode 'd' [Tnode 'e' [], Tnode 'f' []]
+            , Tnode 'g' []]
+
+test70 = TestCase $ assertEqual "nnodes, mtreeToString, stringToMtree"
+  (7, "abc^^de^f^^g^^", Just mtree7)
+  $ (nnodes mtree7, mtreeToString mtree7, stringToMtree "abc^^de^f^^g^^")
+
+test71 = TestCase $ assertEqual "ipl"
+  9
+  $ ipl mtree7
+
+test72 = TestCase $ assertEqual "bottomUp"
+  "cbefdga"
+  $ bottomUp mtree7
+
+test73 = TestCase $ assertEqual "sexp"
+  "(a (b c) (d e f) g)"
+  $ sexp mtree7
 
 tests =
   [test01, test02, test03, test04, test05,
@@ -281,7 +303,8 @@ tests =
    test41, test46, test47, test48, test49,
    test50, test55, test56, test57, test58,
    test61, test62, test63, test64, test67,
-   test68, test69]
+   test68, test69, test70, test71, test72,
+   test73]
 
 testlist = TestList tests
 
