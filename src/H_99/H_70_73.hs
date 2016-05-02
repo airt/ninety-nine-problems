@@ -2,20 +2,20 @@
 --Problem 70-73
 --https://wiki.haskell.org/99_questions/70B_to_73
 
-module H_99.H_70_73
-( Mtree(..)
-, nnodes
-, mtreeToString
-, stringToMtree
-, ipl
-, bottomUp
-, sexp
+module H_99.H_70_73 (
+  Mtree(..),
+  nnodes,
+  mtreeToString,
+  stringToMtree,
+  ipl,
+  bottomUp,
+  sexp,
 ) where
 
-import Data.Maybe
+import Data.Maybe (isNothing, fromJust)
 
 data Mtree a = Tnode a [Mtree a]
-  deriving (Eq, Show, Read)
+  deriving (Eq, Read, Show)
 
 {-
 70B. Check whether a given term represents a multiway tree.
@@ -87,23 +87,21 @@ mtreeToString :: Mtree Char -> String
 mtreeToString (Tnode x ts) = [x] ++ concatMap mtreeToString ts ++ "^"
 
 stringToMtree :: String -> Maybe (Mtree Char)
-stringToMtree s = snd . parseTree $ s
+stringToMtree = snd . parseTree
 
 parseTree :: String -> (String, Maybe (Mtree Char))
 parseTree (x:s) =
   if any isNothing ts
   then (rs, Nothing)
   else (rs, Just $ Tnode x $ map fromJust ts)
-  where
-    (rs,ts) = parseTrees s
+  where (rs,ts) = parseTrees s
 parseTree _ = ("", Nothing)
 
 parseTrees :: String -> (String, [Maybe (Mtree Char)])
 parseTrees ('^':s) = (s, [])
-parseTrees (s) = (ors, t : ots)
-  where
-    (rs,t) = parseTree s
-    (ors,ots) = parseTrees rs
+parseTrees s = (ors, t : ots)
+  where (rs,t) = parseTree s
+        (ors,ots) = parseTrees rs
 
 {-
 71. Determine the internal path length of a tree.

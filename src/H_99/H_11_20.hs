@@ -2,22 +2,22 @@
 --Problem 11-20
 --https://wiki.haskell.org/99_questions/11_to_20
 
-module H_99.H_11_20
-( Elem(..)
-, encodeModified
-, decodeModified
-, encodeDirect
-, dupli
-, repli
-, dropEvery
-, split
-, slice
-, rotate
-, removeAt
+module H_99.H_11_20 (
+  Elem(..),
+  encodeModified,
+  decodeModified,
+  encodeDirect,
+  dupli,
+  repli,
+  dropEvery,
+  split,
+  slice,
+  rotate,
+  removeAt,
 ) where
 
-import H_99.H_01_10
-import Data.List
+import H_99.H_01_10 (encode)
+import Data.List    (genericDrop, genericReplicate, genericTake)
 
 {-
 11. Modified run-length encoding.
@@ -36,13 +36,12 @@ P11> encodeModified "aaaabccaadeeee"
 -}
 
 data Elem a = Single a | Multiple Int a
-  deriving (Eq, Show, Read)
+  deriving (Eq, Read, Show)
 
 encodeModified :: (Eq a) => [a] -> [Elem a]
-encodeModified xs = map f . encode $ xs
-  where
-    f (1, x) = Single x
-    f (n, x) = Multiple n x
+encodeModified = map f . encode
+  where f (1, x) = Single x
+        f (n, x) = Multiple n x
 
 {-
 12. Decode a run-length encoded list.
@@ -58,8 +57,8 @@ P12> decodeModified
 
 decodeModified :: (Eq a) => [Elem a] -> [a]
 decodeModified [] = []
-decodeModified ((Single y):xs) = [y] ++ decodeModified xs
-decodeModified ((Multiple n y):xs) = genericReplicate n y ++ decodeModified xs
+decodeModified (Single y:xs)     = y : decodeModified xs
+decodeModified (Multiple n y:xs) = genericReplicate n y ++ decodeModified xs
 
 {-
 13. Run-length encoding of a list (direct solution).
@@ -79,14 +78,13 @@ P13> encodeDirect "aaaabccaadeeee"
 -}
 
 encodeDirect :: (Eq a) => [a] -> [Elem a]
-encodeDirect xs = foldr f [] xs
-  where
-    f x [] = [Single x]
-    f x ((Single y):zs)
-      | x == y = Multiple 2 x : zs
-    f x ((Multiple n y):zs)
-      | x == y = Multiple (n + 1) x : zs
-    f x acc = Single x : acc
+encodeDirect = foldr f []
+  where f x [] = [Single x]
+        f x (Single y:zs)
+          | x == y = Multiple 2 x : zs
+        f x (Multiple n y:zs)
+          | x == y = Multiple (n + 1) x : zs
+        f x acc = Single x : acc
 
 {-
 14. Duplicate the elements of a list.
@@ -148,10 +146,9 @@ Example in Haskell:
 
 split :: (Integral b) => [a] -> b -> ([a], [a])
 split xs n = foldr f ([], []) . zip [1..] $ xs
-  where
-    f (i,x) (ys,zs)
-      | i <= n    = (x : ys, zs)
-      | otherwise = (ys, x : zs)
+  where f (i,x) (ys,zs)
+          | i <= n    = (x : ys, zs)
+          | otherwise = (ys, x : zs)
 
 {-
 18. Extract a slice from a list.
@@ -190,8 +187,7 @@ Examples in Haskell:
 
 rotate :: (Integral b) => [a] -> b -> [a]
 rotate xs n = b ++ a
-  where
-    (a, b) = split xs . mod n . fromIntegral . length $ xs
+  where (a, b) = split xs . mod n . fromIntegral . length $ xs
 
 {-
 20. Remove the K'th element from a list.
@@ -214,7 +210,6 @@ Example in Haskell:
 
 removeAt :: (Integral b) => b -> [a] -> (a, [a])
 removeAt k xs = foldr f (head xs, []) . zip [1..] $ xs
-  where
-    f (i,x) (z,zs)
-      | i == k    = (x, zs)
-      | otherwise = (z, x : zs)
+  where f (i,x) (z,zs)
+          | i == k    = (x, zs)
+          | otherwise = (z, x : zs)

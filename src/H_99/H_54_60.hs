@@ -2,16 +2,16 @@
 --Problem 54-60
 --https://wiki.haskell.org/99_questions/54A_to_60
 
-module H_99.H_54_60
-( Btree(..)
-, cbalTree
-, symmetric
-, construct
-, symCbalTrees
+module H_99.H_54_60 (
+  Btree(..),
+  cbalTree,
+  symmetric,
+  construct,
+  symCbalTrees,
 ) where
 
 data Btree a = Empty | Branch a (Btree a) (Btree a)
-  deriving (Eq, Show, Read)
+  deriving (Eq, Read, Show)
 
 {-
 54A. Check whether a given term represents a binary tree.
@@ -97,11 +97,10 @@ cbalTree n =
   then [ Branch x l r | l <- ts1, r <- ts1 ]
   else [ Branch x l r | l <- ts1, r <- ts2 ] ++
        [ Branch x l r | l <- ts2, r <- ts1 ]
-  where
-    (q, m) = divMod (n - 1) 2
-    ts1 = cbalTree q
-    ts2 = if m == 0 then ts1 else cbalTree (q + 1)
-    x = 'x'
+  where (q, m) = divMod (n - 1) 2
+        ts1 = cbalTree q
+        ts2 = if m == 0 then ts1 else cbalTree (q + 1)
+        x = 'x'
 
 {-
 56. Symmetric binary trees.
@@ -166,7 +165,7 @@ add x t@(Branch y l r)
   | otherwise = t
 
 construct :: (Ord a) => [a] -> Btree a
-construct xs = foldr add Empty . reverse $ xs
+construct = foldr add Empty . reverse
 
 {-
 58. Generate-and-test paradigm.
@@ -189,7 +188,7 @@ Example in Haskell:
 -}
 
 symCbalTrees :: (Integral a) => a -> [Btree Char]
-symCbalTrees n = filter symmetric . cbalTree $ n
+symCbalTrees = filter symmetric . cbalTree
 
 {-
 59. Construct height-balanced binary trees.

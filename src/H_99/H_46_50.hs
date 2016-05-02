@@ -2,22 +2,23 @@
 --Problem 46-50
 --https://wiki.haskell.org/99_questions/46_to_50
 
-module H_99.H_46_50
-( and'
-, or'
-, nand'
-, nor'
-, xor'
-, impl'
-, equ'
-, table
-, tablen
-, gray
-, huffman
+module H_99.H_46_50 (
+  and',
+  or',
+  nand',
+  nor',
+  xor',
+  impl',
+  equ',
+  table,
+  tablen,
+  gray,
+  huffman,
 ) where
 
-import Data.Function
-import Data.List
+import Control.Arrow (first, second)
+import Data.Function (on)
+import Data.List     (insertBy, sortOn)
 
 {-
 46. Define predicates and/2, or/2, nand/2, nor/2, xor/2, impl/2 and equ/2
@@ -138,11 +139,10 @@ False False False False
 genBools :: (Integral a) => a -> [[Bool]]
 genBools 0 = [[]]
 genBools n = concatMap f . genBools $ n - 1
-  where
-    f xs = map (:xs) [True, False]
+  where f xs = map (:xs) [True, False]
 
 tablen :: (Integral a) => a -> ([Bool] -> Bool) -> [[Bool]]
-tablen n f = map (\bs -> bs ++ [f bs]) . map reverse . genBools $ n
+tablen n f = map ((\bs -> bs ++ [f bs]) . reverse) . genBools $ n
 
 {-
 49. Gray codes.
@@ -166,8 +166,7 @@ P49> gray 3
 gray :: (Integral a) => a -> [String]
 gray 0 = [""]
 gray x = map ('0':) xs ++ map ('1':) (reverse xs)
-  where
-    xs = gray (x - 1)
+  where xs = gray (x - 1)
 
 {-
 50. Huffman codes.
@@ -186,26 +185,25 @@ Example in Haskell:
 -}
 
 data Htree a = Leaf a | Branch (Htree a) (Htree a)
-  deriving (Eq, Show, Read)
+  deriving (Eq, Read, Show)
 
 insertOn :: (Ord b) => (a -> b) -> a -> [a] -> [a]
-insertOn f x xs = insertBy (compare `on` f) x xs
+insertOn f = insertBy (compare `on` f)
 
 leaves :: (Ord b, Num b) => [(a, b)] -> [(Htree a, b)]
-leaves xs = sortOn snd . map (\(x,w) -> (Leaf x, w)) $ xs
+leaves = sortOn snd . map (first Leaf)
 
 htree :: (Ord b, Num b) => [(Htree a, b)] -> Htree a
-htree ((t,w):[]) = t
+htree [(t,w)] = t
 htree (x1:x2:xs) = htree . insertOn snd (merge x1 x2) $ xs
 
 merge :: (Num b) => (Htree a, b) -> (Htree a, b) -> (Htree a, b)
 merge (t1,w1) (t2,w2) = (Branch t1 t2, w1 + w2)
 
-serialize :: (Htree a) -> [(a, String)]
+serialize :: Htree a -> [(a, String)]
 serialize (Leaf x) = [(x, [])]
 serialize (Branch l r) = concatMap f [('0', l), ('1', r)]
-  where
-    f (b,t) = map (\(x,c) -> (x, b : c)) . serialize $ t
+  where f (b,t) = map (second (b :)) . serialize $ t
 
-huffman :: (Ord a, Ord b, Num b) => [(a,b)] -> [(a,[Char])]
-huffman xs = sortOn fst . serialize . htree . leaves $ xs
+huffman :: (Ord a, Ord b, Num b) => [(a,b)] -> [(a,String)]
+huffman = sortOn fst . serialize . htree . leaves

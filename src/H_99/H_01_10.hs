@@ -2,18 +2,18 @@
 --Problem 1-10
 --https://wiki.haskell.org/99_questions/1_to_10
 
-module H_99.H_01_10
-( NestedList(..)
-, myLast
-, myButLast
-, elementAt
-, myLength
-, myReverse
-, isPalindrome
-, flatten
-, compress
-, pack
-, encode
+module H_99.H_01_10 (
+  NestedList(..),
+  myLast,
+  myButLast,
+  elementAt,
+  myLength,
+  myReverse,
+  isPalindrome,
+  flatten,
+  compress,
+  pack,
+  encode,
 ) where
 
 {-
@@ -31,7 +31,7 @@ myLast :: [a] -> a
 myLast [] = error "myLast: empty list"
 myLast xs = foldr1 (flip const) xs
 
-myLast' = head . reverse
+-- myLast' = head . reverse
 
 {-
 2. Find the last but one element of a list.
@@ -48,7 +48,7 @@ myButLast :: [a] -> a
 myButLast []     = error "myButLast: empty list"
 myButLast [x]    = error "myButLast: one element list"
 myButLast [x,_]  = x
-myButLast (x:xs) = myButLast xs
+myButLast (_:xs) = myButLast xs
 
 myButLast' = (!!1) . reverse
 
@@ -83,7 +83,7 @@ Prelude> myLength "Hello, world!"
 -}
 
 myLength :: (Num b) => [a] -> b
-myLength xs = foldr (const (+1)) 0 xs
+myLength = foldr (const (+1)) 0
 
 myLength' = sum . map (const 1)
 
@@ -98,7 +98,7 @@ Prelude> myReverse [1,2,3,4]
 -}
 
 myReverse :: [a] -> [a]
-myReverse xs = foldl (flip (:)) [] xs
+myReverse = foldl (flip (:)) []
 
 {-
 6. Find out whether a list is a palindrome.
@@ -161,12 +161,11 @@ Example in Haskell:
 -}
 
 compress :: (Eq a) => [a] -> [a]
-compress xs = foldr f [] xs
-  where
-    f x [] = [x]
-    f x z
-      | x == head z = z
-      | otherwise   = x : z
+compress = foldr f []
+  where f x [] = [x]
+        f x z
+          | x == head z = z
+          | otherwise   = x : z
 
 {-
 9. Pack consecutive duplicates of list elements into sublists.
@@ -183,12 +182,11 @@ Example in Haskell:
 -}
 
 pack :: (Eq a) => [a] -> [[a]]
-pack xs = foldr f [] xs
-  where
-    f x [] = [[x]]
-    f x acc@(z:zs)
-      | x == head z = (x : z) : zs
-      | otherwise   = [x] : acc
+pack = foldr f []
+  where f x [] = [[x]]
+        f x acc@(z:zs)
+          | x == head z = (x : z) : zs
+          | otherwise   = [x] : acc
 
 {-
 10. Run-length encoding of a list.
@@ -207,9 +205,8 @@ encode "aaaabccaadeeee"
 -}
 
 encode :: (Eq a, Num b) => [a] -> [(b, a)]
-encode xs = foldr f [] xs
-  where
-    f x [] = [(1, x)]
-    f x acc@((n,y):zs)
-      | x == y    = (1 + n, x) : zs
-      | otherwise = (1, x) : acc
+encode = foldr f []
+  where f x [] = [(1, x)]
+        f x as@((n,y):zs)
+          | x == y    = (1 + n, x) : zs
+          | otherwise = (1, x) : as
