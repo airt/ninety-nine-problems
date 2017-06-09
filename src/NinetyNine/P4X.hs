@@ -1,23 +1,11 @@
---Problem 46-50
---https://wiki.haskell.org/99_questions/46_to_50
+-- 46 - 50
+-- https://wiki.haskell.org/99_questions/46_to_50
 
-module H_99.H_46_50 (
-  and',
-  or',
-  nand',
-  nor',
-  xor',
-  impl',
-  equ',
-  table,
-  tablen,
-  gray,
-  huffman,
-) where
+module NinetyNine.P4X where
 
 import Control.Arrow (first, second)
 import Data.Function (on)
-import Data.List     (insertBy, sortOn)
+import Data.List (insertBy, sortOn)
 
 {-
 46. Define predicates and/2, or/2, nand/2, nor/2, xor/2, impl/2 and equ/2
@@ -135,12 +123,13 @@ False False True  False
 False False False False
 -}
 
-genBools :: (Integral a) => a -> [[Bool]]
+genBools :: Integral a => a -> [[Bool]]
 genBools 0 = [[]]
 genBools n = concatMap f . genBools $ n - 1
-  where f xs = map (:xs) [True, False]
+  where
+    f xs = map (:xs) [True, False]
 
-tablen :: (Integral a) => a -> ([Bool] -> Bool) -> [[Bool]]
+tablen :: Integral a => a -> ([Bool] -> Bool) -> [[Bool]]
 tablen n f = map ((\bs -> bs ++ [f bs]) . reverse) . genBools $ n
 
 {-
@@ -162,10 +151,11 @@ P49> gray 3
 ["000","001","011","010","110","111","101","100"]
 -}
 
-gray :: (Integral a) => a -> [String]
+gray :: Integral a => a -> [String]
 gray 0 = [""]
 gray x = map ('0':) xs ++ map ('1':) (reverse xs)
-  where xs = gray (x - 1)
+  where
+    xs = gray (x - 1)
 
 {-
 50. Huffman codes.
@@ -183,26 +173,27 @@ Example in Haskell:
 [('a',"0"),('b',"101"),('c',"100"),('d',"111"),('e',"1101"),('f',"1100")]
 -}
 
-data Htree a = Leaf a | Branch (Htree a) (Htree a)
+data Htree a = Leaf a | HBranch (Htree a) (Htree a)
   deriving (Eq, Read, Show)
 
-insertOn :: (Ord b) => (a -> b) -> a -> [a] -> [a]
+insertOn :: Ord b => (a -> b) -> a -> [a] -> [a]
 insertOn f = insertBy (compare `on` f)
-
-leaves :: (Ord b, Num b) => [(a, b)] -> [(Htree a, b)]
-leaves = sortOn snd . map (first Leaf)
 
 htree :: (Ord b, Num b) => [(Htree a, b)] -> Htree a
 htree [(t,w)] = t
 htree (x1:x2:xs) = htree . insertOn snd (merge x1 x2) $ xs
 
-merge :: (Num b) => (Htree a, b) -> (Htree a, b) -> (Htree a, b)
-merge (t1,w1) (t2,w2) = (Branch t1 t2, w1 + w2)
+merge :: Num b => (Htree a, b) -> (Htree a, b) -> (Htree a, b)
+merge (t1,w1) (t2,w2) = (HBranch t1 t2, w1 + w2)
 
 serialize :: Htree a -> [(a, String)]
 serialize (Leaf x) = [(x, [])]
-serialize (Branch l r) = concatMap f [('0', l), ('1', r)]
-  where f (b,t) = map (second (b :)) . serialize $ t
+serialize (HBranch l r) = concatMap f [('0', l), ('1', r)]
+  where
+    f (b,t) = map (second (b :)) . serialize $ t
 
 huffman :: (Ord a, Ord b, Num b) => [(a,b)] -> [(a,String)]
 huffman = sortOn fst . serialize . htree . leaves
+  where
+    leaves :: (Ord b, Num b) => [(a, b)] -> [(Htree a, b)]
+    leaves = sortOn snd . map (first Leaf)

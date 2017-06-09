@@ -1,19 +1,9 @@
---Problem 1-10
---https://wiki.haskell.org/99_questions/1_to_10
+-- 1 - 10
+-- https://wiki.haskell.org/99_questions/1_to_10
 
-module H_99.H_01_10 (
-  NestedList(..),
-  myLast,
-  myButLast,
-  elementAt,
-  myLength,
-  myReverse,
-  isPalindrome,
-  flatten,
-  compress,
-  pack,
-  encode,
-) where
+module NinetyNine.P0X where
+
+import Control.Arrow ((&&&))
 
 {-
 1. Find the last element of a list.
@@ -26,9 +16,10 @@ Prelude> myLast ['x','y','z']
 'z'
 -}
 
+{-# ANN myLast "HLint: ignore" #-}
+
 myLast :: [a] -> a
-myLast [] = error "myLast: empty list"
-myLast xs = foldr1 (flip const) xs
+myLast = foldr1 (flip const)
 
 -- myLast' = head . reverse
 
@@ -44,12 +35,7 @@ Prelude> myButLast ['a'..'z']
 -}
 
 myButLast :: [a] -> a
-myButLast []     = error "myButLast: empty list"
-myButLast [x]    = error "myButLast: one element list"
-myButLast [x,_]  = x
-myButLast (_:xs) = myButLast xs
-
-myButLast' = (!!1) . reverse
+myButLast = head . tail . reverse
 
 {-
 3. Find the K'th element of a list.
@@ -66,10 +52,10 @@ Prelude> elementAt "haskell" 5
 'e'
 -}
 
-elementAt :: (Integral b) => [a] -> b -> a
-elementAt []     n = error "elementAt: index out of bounds"
-elementAt (x:xs) 1 = x
-elementAt (x:xs) n = elementAt xs (n - 1)
+elementAt :: Integral b => [a] -> b -> a
+elementAt (x : __) 1 = x
+elementAt (_ : xs) n = elementAt xs (n - 1)
+elementAt _ _ = error "elementAt: index out of bounds"
 
 {-
 4. Find the number of elements of a list.
@@ -81,10 +67,8 @@ Prelude> myLength "Hello, world!"
 13
 -}
 
-myLength :: (Num b) => [a] -> b
-myLength = foldr (const (+1)) 0
-
-myLength' = sum . map (const 1)
+myLength :: Integral b => [a] -> b
+myLength = sum . map (const 1)
 
 {-
 5. Reverse a list.
@@ -113,7 +97,7 @@ True
 True
 -}
 
-isPalindrome :: (Eq a) => [a] -> Bool
+isPalindrome :: Eq a => [a] -> Bool
 isPalindrome xs = xs == reverse xs
 
 {-
@@ -137,12 +121,12 @@ We have to define a new data type, because lists in Haskell are homogeneous.
 -}
 
 data NestedList a = Elem a | List [NestedList a]
-  deriving (Show, Read)
+  deriving (Eq, Read, Show)
 
 flatten :: NestedList a -> [a]
-flatten (Elem x)      = [x]
-flatten (List [])     = []
-flatten (List (x:xs)) = flatten x ++ flatten (List xs)
+flatten (Elem x) = [x]
+flatten (List []) = []
+flatten (List (x : xs)) = flatten x ++ flatten (List xs)
 
 {-
 8. Eliminate consecutive duplicates of list elements.
@@ -159,12 +143,8 @@ Example in Haskell:
 "abcade"
 -}
 
-compress :: (Eq a) => [a] -> [a]
-compress = foldr f []
-  where f x [] = [x]
-        f x z
-          | x == head z = z
-          | otherwise   = x : z
+compress :: Eq a => [a] -> [a]
+compress = map head . pack
 
 {-
 9. Pack consecutive duplicates of list elements into sublists.
@@ -180,12 +160,11 @@ Example in Haskell:
 ["aaaa","b","cc","aa","d","eeee"]
 -}
 
-pack :: (Eq a) => [a] -> [[a]]
-pack = foldr f []
-  where f x [] = [[x]]
-        f x acc@(z:zs)
-          | x == head z = (x : z) : zs
-          | otherwise   = [x] : acc
+pack :: Eq a => [a] -> [[a]]
+pack [] = []
+pack (x : xs) = (x : ys) : pack zs
+  where
+    (ys, zs) = span (== x) xs
 
 {-
 10. Run-length encoding of a list.
@@ -203,9 +182,5 @@ encode "aaaabccaadeeee"
 [(4,'a'),(1,'b'),(2,'c'),(2,'a'),(1,'d'),(4,'e')]
 -}
 
-encode :: (Eq a, Num b) => [a] -> [(b, a)]
-encode = foldr f []
-  where f x [] = [(1, x)]
-        f x as@((n,y):zs)
-          | x == y    = (1 + n, x) : zs
-          | otherwise = (1, x) : as
+encode :: Eq a => [a] -> [(Int, a)]
+encode = map (length &&& head) . pack

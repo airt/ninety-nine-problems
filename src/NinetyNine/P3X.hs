@@ -1,22 +1,10 @@
---Problem 31-41
---https://wiki.haskell.org/99_questions/31_to_41
+-- 31 - 41
+-- https://wiki.haskell.org/99_questions/31_to_41
 
-module H_99.H_31_41 (
-  primes,
-  isPrime,
-  myGCD,
-  coprime,
-  totient,
-  primeFactors,
-  primeFactorsMult,
-  totient',
-  primesR,
-  goldbach,
-  goldbachList,
-  goldbachList',
-) where
+module NinetyNine.P3X where
 
-import Data.List (genericLength, group)
+import Control.Arrow ((&&&))
+import Data.List (group)
 
 {-
 31. Determine whether a given integer number is prime.
@@ -30,12 +18,13 @@ P31> isPrime 7
 True
 -}
 
-primes :: (Integral a) => [a]
+primes :: Integral a => [a]
 primes = sieve [2..]
-  where sieve (x:xs) = x : sieve [ y | y <- xs, rem y x /= 0 ]
+  where
+    sieve (x : xs) = x : sieve [ y | y <- xs, rem y x /= 0 ]
 
-isPrime :: (Integral a) => a -> Bool
-isPrime x = (==x) . last . takeWhile (<=x) $ primes
+isPrime :: Integral a => a -> Bool
+isPrime x = (== x) . head . dropWhile (< x) $ primes
 
 {-
 32. Determine the greatest common divisor of two positive integer numbers.
@@ -50,10 +39,11 @@ Example in Haskell:
 [9,3,3]
 -}
 
-myGCD :: (Integral a) => a -> a -> a
-myGCD x y = aux . map abs $ [x, y]
-  where aux [0, y] = y
-        aux [x, y] = aux [mod y x, x]
+myGCD :: Integral a => a -> a -> a
+myGCD x y | x < 0 = myGCD (abs x) y
+myGCD x y | y < 0 = myGCD x (abs y)
+myGCD 0 y = y
+myGCD x y = myGCD (mod y x) x
 
 {-
 33. Determine whether two positive integer numbers are coprime.
@@ -68,7 +58,7 @@ Example in Haskell:
 True
 -}
 
-coprime :: (Integral a) => a -> a -> Bool
+coprime :: Integral a => a -> a -> Bool
 coprime x y = gcd x y == 1
 
 {-
@@ -90,8 +80,8 @@ Example in Haskell:
 4
 -}
 
-totient :: (Integral a) => a -> a
-totient x = fromIntegral . length . filter (coprime x) $ [1..x-1]
+totient :: Integral a => a -> Int
+totient x = length . filter (coprime x) $ [1..x]
 
 {-
 35. Determine the prime factors of a given positive integer.
@@ -106,12 +96,13 @@ Example in Haskell:
 [3, 3, 5, 7]
 -}
 
-primeFactors :: (Integral a) => a -> [a]
-primeFactors = reverse . aux []
-  where aux rs x
-          | isPrime x = x : rs
-          | otherwise = let fct = factor x in aux (fct : rs) (div x fct)
-        factor x = head . filter ((==0) . mod x) $ [2..x]
+primeFactors :: Integral a => a -> [a]
+primeFactors = reverse . h []
+  where
+    h rs x
+      | isPrime x = x : rs
+      | otherwise = let r = factor x in h (r : rs) (div x r)
+    factor x = head . filter ((== 0) . mod x) $ [2..x]
 
 {-
 36. Determine the prime factors of a given positive integer.
@@ -126,9 +117,8 @@ Example in Haskell:
 [(3,2),(5,1),(7,1)]
 -}
 
-primeFactorsMult :: (Integral a) => a -> [(a, a)]
-primeFactorsMult = map f . group . primeFactors
-  where f xs = (head xs, genericLength xs)
+primeFactorsMult :: Integral a => a -> [(a, Int)]
+primeFactorsMult = map (head &&& length) . group . primeFactors
 
 {-
 37. Calculate Euler's totient function phi(m) (improved).
@@ -147,9 +137,10 @@ phi(m) = (p1 - 1) * p1 ** (m1 - 1) *
 Note that a ** b stands for the b'th power of a.
 -}
 
-totient' :: (Integral a) => a -> a
+totient' :: Integral a => a -> a
 totient' = product . map f . primeFactorsMult
-  where f (p,m) = (p - 1) * p ^ (m - 1)
+  where
+    f (p, m) = (p - 1) * p ^ (m - 1)
 
 {-
 38. Compare the two methods of calculating Euler's totient function.
@@ -168,8 +159,8 @@ P29> primesR 10 20
 [11,13,17,19]
 -}
 
-primesR :: (Integral a) => a -> a -> [a]
-primesR a b = takeWhile (<=b) . dropWhile (<a) $ primes
+primesR :: Integral a => a -> a -> [a]
+primesR a b = takeWhile (<= b) . dropWhile (< a) $ primes
 
 {-
 40. Goldbach's conjecture.
@@ -192,9 +183,10 @@ Example in Haskell:
 (5, 23)
 -}
 
-goldbach :: (Integral a) => a -> (a, a)
+goldbach :: Integral a => a -> (a, a)
 goldbach x = head . filter (isPrime . snd) . map f . primesR 2 $ x - 1
-  where f y = (y, x - y)
+  where
+    f y = (y, x - y)
 
 {-
 41. Given a range of integers by its lower and upper limit,
@@ -226,9 +218,10 @@ Example in Haskell:
 [(73,919),(61,1321),(67,1789),(61,1867)]
 -}
 
-goldbachList :: (Integral a) => a -> a -> [(a, a)]
+goldbachList :: Integral a => a -> a -> [(a, a)]
 goldbachList x y = map goldbach . filter even $ [x..y]
 
-goldbachList' :: (Integral a) => a -> a -> a -> [(a, a)]
+goldbachList' :: Integral a => a -> a -> a -> [(a, a)]
 goldbachList' x y z = filter p $ goldbachList x y
-  where p (a,b) = all (>z) [a, b]
+  where
+    p (a, b) = all (> z) [a, b]

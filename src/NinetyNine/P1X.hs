@@ -1,22 +1,10 @@
---Problem 11-20
---https://wiki.haskell.org/99_questions/11_to_20
+-- 11 - 20
+-- https://wiki.haskell.org/99_questions/11_to_20
 
-module H_99.H_11_20 (
-  Elem(..),
-  encodeModified,
-  decodeModified,
-  encodeDirect,
-  dupli,
-  repli,
-  dropEvery,
-  split,
-  slice,
-  rotate,
-  removeAt,
-) where
+module NinetyNine.P1X where
 
-import H_99.H_01_10 (encode)
-import Data.List    (genericDrop, genericReplicate, genericTake)
+import Data.Tuple (swap)
+import NinetyNine.P0X (encode)
 
 {-
 11. Modified run-length encoding.
@@ -37,10 +25,11 @@ P11> encodeModified "aaaabccaadeeee"
 data Elem a = Single a | Multiple Int a
   deriving (Eq, Read, Show)
 
-encodeModified :: (Eq a) => [a] -> [Elem a]
+encodeModified :: Eq a => [a] -> [Elem a]
 encodeModified = map f . encode
-  where f (1, x) = Single x
-        f (n, x) = Multiple n x
+  where
+    f (1, x) = Single x
+    f (n, x) = Multiple n x
 
 {-
 12. Decode a run-length encoded list.
@@ -54,10 +43,10 @@ P12> decodeModified
 "aaaabccaadeeee"
 -}
 
-decodeModified :: (Eq a) => [Elem a] -> [a]
+decodeModified :: Eq a => [Elem a] -> [a]
 decodeModified [] = []
-decodeModified (Single y:xs)     = y : decodeModified xs
-decodeModified (Multiple n y:xs) = genericReplicate n y ++ decodeModified xs
+decodeModified (Single y : xs) = y : decodeModified xs
+decodeModified (Multiple n y : xs) = replicate n y ++ decodeModified xs
 
 {-
 13. Run-length encoding of a list (direct solution).
@@ -76,14 +65,15 @@ P13> encodeDirect "aaaabccaadeeee"
  Multiple 2 'a',Single 'd',Multiple 4 'e']
 -}
 
-encodeDirect :: (Eq a) => [a] -> [Elem a]
+encodeDirect :: Eq a => [a] -> [Elem a]
 encodeDirect = foldr f []
-  where f x [] = [Single x]
-        f x (Single y:zs)
-          | x == y = Multiple 2 x : zs
-        f x (Multiple n y:zs)
-          | x == y = Multiple (n + 1) x : zs
-        f x acc = Single x : acc
+  where
+    f x [] = [Single x]
+    f x (Single y : zs)
+      | x == y = Multiple 2 x : zs
+    f x (Multiple n y : zs)
+      | x == y = Multiple (n + 1) x : zs
+    f x zs = Single x : zs
 
 {-
 14. Duplicate the elements of a list.
@@ -98,7 +88,7 @@ Example in Haskell:
 -}
 
 dupli :: [a] -> [a]
-dupli xs = repli xs 2
+dupli = flip repli 2
 
 {-
 15. Replicate the elements of a list a given number of times.
@@ -112,8 +102,8 @@ Example in Haskell:
 "aaabbbccc"
 -}
 
-repli :: (Integral b) => [a] -> b -> [a]
-repli xs n = concatMap (genericReplicate n) xs
+repli :: [a] -> Int -> [a]
+repli xs n = replicate n =<< xs
 
 {-
 16. Drop every N'th element from a list.
@@ -127,8 +117,8 @@ Example in Haskell:
 "abdeghk"
 -}
 
-dropEvery :: (Integral b) => [a] -> b -> [a]
-dropEvery xs n = map snd . filter ((/=0) . (`mod`n) . fst) . zip [1..] $ xs
+dropEvery :: Integral b => [a] -> b -> [a]
+dropEvery xs n = [x | (i, x) <- zip [1..] xs, mod i n /= 0]
 
 {-
 17. Split a list into two parts; the length of the first part is given.
@@ -143,11 +133,12 @@ Example in Haskell:
 ("abc", "defghik")
 -}
 
-split :: (Integral b) => [a] -> b -> ([a], [a])
+split :: Integral b => [a] -> b -> ([a], [a])
 split xs n = foldr f ([], []) . zip [1..] $ xs
-  where f (i,x) (ys,zs)
-          | i <= n    = (x : ys, zs)
-          | otherwise = (ys, x : zs)
+  where
+    f (i, x) (ys, zs)
+      | i <= n = (x : ys, zs)
+      | otherwise = (ys, x : zs)
 
 {-
 18. Extract a slice from a list.
@@ -164,8 +155,8 @@ Example in Haskell:
 "cdefg"
 -}
 
-slice :: (Integral b) => [a] -> b -> b -> [a]
-slice xs i k = genericTake (k - i + 1) . genericDrop (i - 1) $ xs
+slice :: [a] -> Int -> Int -> [a]
+slice xs i k = take (k - i + 1) . drop (i - 1) $ xs
 
 {-
 19. Rotate a list N places to the left.
@@ -184,9 +175,8 @@ Examples in Haskell:
 "ghabcdef"
 -}
 
-rotate :: (Integral b) => [a] -> b -> [a]
-rotate xs n = b ++ a
-  where (a, b) = split xs . mod n . fromIntegral . length $ xs
+rotate :: [a] -> Int -> [a]
+rotate xs n = uncurry (++) . swap . split xs . mod n . length $ xs
 
 {-
 20. Remove the K'th element from a list.
@@ -207,8 +197,9 @@ Example in Haskell:
 ('b',"acd")
 -}
 
-removeAt :: (Integral b) => b -> [a] -> (a, [a])
+removeAt :: Integral b => b -> [a] -> (a, [a])
 removeAt k xs = foldr f (head xs, []) . zip [1..] $ xs
-  where f (i,x) (z,zs)
-          | i == k    = (x, zs)
-          | otherwise = (z, x : zs)
+  where
+    f (i, x) (z, zs)
+      | i == k = (x, zs)
+      | otherwise = (z, x : zs)

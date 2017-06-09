@@ -1,24 +1,10 @@
---Problem 61-69
---https://wiki.haskell.org/99_questions/61_to_69
+-- 61 - 69
+-- https://wiki.haskell.org/99_questions/61_to_69
 
-module H_99.H_61_69 (
-  countLeaves,
-  leaves,
-  internals,
-  atLevel,
-  completeBinaryTree,
-  isCompleteBinaryTree,
-  layout,
-  treeToString,
-  stringToTree,
-  preorder,
-  inorder,
-  tree2ds,
-  ds2tree,
-) where
+module NinetyNine.P6X where
 
-import Data.Maybe   (isNothing, fromJust)
-import H_99.H_54_60 (Btree(..))
+import Data.Maybe (isNothing, fromJust)
+import NinetyNine.P5X (Btree(..))
 
 {-
 61. Count the leaves of a binary tree.
@@ -34,7 +20,7 @@ Example in Haskell:
 2
 -}
 
-countLeaves :: (Integral b) => Btree a -> b
+countLeaves :: Integral b => Btree a -> b
 countLeaves Empty = 0
 countLeaves (Branch _ Empty Empty) = 1
 countLeaves (Branch _ l r) = sum . map countLeaves $ [l, r]
@@ -92,7 +78,7 @@ Prelude> atLevel tree4 2
 Prelude> [2,2]
 -}
 
-atLevel :: (Integral b) => Btree a -> b -> [a]
+atLevel :: Integral b => Btree a -> b -> [a]
 atLevel Empty n = []
 atLevel (Branch x l r) 1 = [x]
 atLevel (Branch x l r) n = concatMap (`atLevel` (n - 1)) [l, r]
@@ -130,13 +116,13 @@ Main> isCompleteBinaryTree $ Branch 'x' (Branch 'x' Empty Empty)
 True
 -}
 
-buildCBT :: (Integral b) => a -> b -> b -> Btree a
+buildCBT :: Integral b => a -> b -> b -> Btree a
 buildCBT x n i =
   if n - i < 0
   then Empty
   else Branch x (buildCBT x n $ i * 2 ) (buildCBT x n $ i * 2 + 1)
 
-completeBinaryTree :: (Integral a) => a -> Btree Char
+completeBinaryTree :: Integral a => a -> Btree Char
 completeBinaryTree n = buildCBT 'x' n 1
 
 isomorphism :: Btree a -> Btree b -> Bool
@@ -145,7 +131,7 @@ isomorphism (Branch _ xl xr) (Branch _ yl yr) =
             isomorphism xl yl && isomorphism xr yr
 isomorphism _ _ = False
 
-countNodes :: (Integral b) => Btree a -> b
+countNodes :: Integral b => Btree a -> b
 countNodes Empty = 0
 countNodes (Branch _ l r) = (+1) . sum . map countNodes $ [l, r]
 
@@ -197,13 +183,14 @@ Branch ('n',(8,1)) (Branch ('k',(6,2)) (Branch ('c',(2,3)) ...
 -- y: available row index
 -- fst tupleReturned: tree with position
 -- snd tupleReturned: next available column index
-layout' :: (Integral b) => (b, b) -> Btree a -> (Btree (a, (b, b)), b)
+layout' :: Integral b => (b, b) -> Btree a -> (Btree (a, (b, b)), b)
 layout' (x,y) Empty = (Empty, x)
 layout' (x,y) (Branch a l r) = (Branch (a, (nl, y)) ll lr, nr)
-  where (ll, nl) = layout' (x     , y + 1) l
-        (lr, nr) = layout' (nl + 1, y + 1) r
+  where
+    (ll, nl) = layout' (x     , y + 1) l
+    (lr, nr) = layout' (nl + 1, y + 1) r
 
-layout :: (Integral b) => Btree a -> Btree (a, (b, b))
+layout :: Integral b => Btree a -> Btree (a, (b, b))
 layout = fst . layout' (1, 1)
 
 {-
@@ -305,8 +292,9 @@ parseTree (x:'(':s) =
   if any isNothing [l, r]
   then (tail sr, Nothing)
   else (tail sr, Just $ Branch x (fromJust l) (fromJust r))
-  where (sl,l) = parseTree s
-        (sr,r) = parseTree sl
+  where
+    (sl,l) = parseTree s
+    (sr,r) = parseTree sl
 parseTree _ = ("", Nothing)
 
 {-
@@ -376,6 +364,7 @@ parseDs (x:s) =
   if any isNothing [l, r]
   then (sr, Nothing)
   else (sr, Just $ Branch x (fromJust l) (fromJust r))
-  where (sl,l) = parseDs s
-        (sr,r) = parseDs sl
+  where
+    (sl,l) = parseDs s
+    (sr,r) = parseDs sl
 parseDs _ = ("", Nothing)

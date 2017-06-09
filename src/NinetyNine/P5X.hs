@@ -1,13 +1,7 @@
---Problem 54-60
---https://wiki.haskell.org/99_questions/54A_to_60
+-- 54 - 60
+-- https://wiki.haskell.org/99_questions/54A_to_60
 
-module H_99.H_54_60 (
-  Btree(..),
-  cbalTree,
-  symmetric,
-  construct,
-  symCbalTrees,
-) where
+module NinetyNine.P5X where
 
 data Btree a = Empty | Branch a (Btree a) (Btree a)
   deriving (Eq, Read, Show)
@@ -89,17 +83,18 @@ whitespace and "comment diagrams" added for clarity and exposition:
 ]
 -}
 
-cbalTree :: (Integral a) => a -> [Btree Char]
+cbalTree :: Integral a => a -> [Btree Char]
 cbalTree 0 = [Empty]
 cbalTree n =
   if m == 0
   then [ Branch x l r | l <- ts1, r <- ts1 ]
   else [ Branch x l r | l <- ts1, r <- ts2 ] ++
        [ Branch x l r | l <- ts2, r <- ts1 ]
-  where (q, m) = divMod (n - 1) 2
-        ts1 = cbalTree q
-        ts2 = if m == 0 then ts1 else cbalTree (q + 1)
-        x = 'x'
+  where
+    (q, m) = divMod (n - 1) 2
+    ts1 = cbalTree q
+    ts2 = if m == 0 then ts1 else cbalTree (q + 1)
+    x = 'x'
 
 {-
 56. Symmetric binary trees.
@@ -156,14 +151,14 @@ True
 True
 -}
 
-add :: (Ord a) => a -> Btree a -> Btree a
+add :: Ord a => a -> Btree a -> Btree a
 add x Empty = Branch x Empty Empty
 add x t@(Branch y l r)
   | x < y     = Branch y (add x l) r
   | x > y     = Branch y l (add x r)
   | otherwise = t
 
-construct :: (Ord a) => [a] -> Btree a
+construct :: Ord a => [a] -> Btree a
 construct = foldr add Empty . reverse
 
 {-
@@ -186,7 +181,7 @@ Example in Haskell:
 ]
 -}
 
-symCbalTrees :: (Integral a) => a -> [Btree Char]
+symCbalTrees :: Integral a => a -> [Btree Char]
 symCbalTrees = filter symmetric . cbalTree
 
 {-

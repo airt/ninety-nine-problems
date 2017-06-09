@@ -1,17 +1,10 @@
---Problem 21-28
---https://wiki.haskell.org/99_questions/21_to_28
+-- 21 - 28
+-- https://wiki.haskell.org/99_questions/21_to_28
 
-module H_99.H_21_28 (
-  insertAt,
-  range,
-  combinations,
-  group',
-  lsort,
-  lfsort,
-) where
+module NinetyNine.P2X where
 
-import Data.Function (on)
-import Data.List     ((\\), genericSplitAt, sortOn, tails)
+import Control.Arrow (second)
+import Data.List ((\\), sortOn, tails)
 
 {-
 21. Insert an element at a given position into a list.
@@ -25,9 +18,8 @@ P21> insertAt 'X' "abcd" 2
 "aXbcd"
 -}
 
-insertAt :: (Integral b) => a -> [a] -> b -> [a]
-insertAt x xs n = ys ++ (x : zs)
-  where (ys,zs) = genericSplitAt (n - 1) xs
+insertAt :: a -> [a] -> Int -> [a]
+insertAt x xs n = uncurry (++) . second (x :) . splitAt (n - 1) $ xs
 
 {-
 22. Create a list containing all integers within a given range.
@@ -42,10 +34,12 @@ Prelude> range 4 9
 -}
 
 range :: (Enum a, Ord a) => a -> a -> [a]
-range x y = aux x y []
-  where aux x y xs
-          | x > y     = xs
-          | otherwise = aux x (pred y) (y : xs)
+range x y | x > y = []
+range x y = h x y []
+  where
+    h x y zs
+      | x > y = zs
+      | otherwise = h x (pred y) (y : zs)
 
 {-
 23. Extract a given number of randomly selected elements from a list.
@@ -101,10 +95,12 @@ Example in Haskell:
 ["abc","abd","abe",...]
 -}
 
-combinations :: (Integral a) => a -> [b] -> [[b]]
-combinations 0 _  = [[]]
-combinations n xs = concatMap f . filter (not . null) . tails $ xs
-  where f (y:ys) = map (y:) . combinations (n - 1) $ ys
+combinations :: Integral a => a -> [b] -> [[b]]
+combinations 0 __ = [[]]
+combinations n xs = (f =<<) . tails $ xs
+  where
+    f [] = []
+    f (y : ys) = map (y :) . combinations (n - 1) $ ys
 
 {-
 27. Group the elements of a set into disjoint subsets.
@@ -147,8 +143,9 @@ P27> group [2,3,4] ["aldo","beat","carla","david","evi",
 
 group' :: (Integral a, Eq b) => [a] -> [b] -> [[[b]]]
 group' [] _ = [[]]
-group' (n:ns) xs = concatMap f . combinations n $ xs
-  where f ys = map (ys:) . group' ns $ (xs \\ ys)
+group' (n : ns) xs = (f =<<) . combinations n $ xs
+  where
+    f ys = map (ys :) . group' ns $ xs \\ ys
 
 {-
 28. Sorting a list of lists according to length of sublists
@@ -186,4 +183,5 @@ lsort = sortOn length
 
 lfsort :: [[a]] -> [[a]]
 lfsort xss = sortOn (freq . length) xss
-  where freq len = length . filter ((==len) . length) $ xss
+  where
+    freq n = length . filter ((== n) . length) $ xss

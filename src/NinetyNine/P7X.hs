@@ -1,15 +1,7 @@
---Problem 70-73
---https://wiki.haskell.org/99_questions/70B_to_73
+-- 70 - 73
+-- https://wiki.haskell.org/99_questions/70B_to_73
 
-module H_99.H_70_73 (
-  Mtree(..),
-  nnodes,
-  mtreeToString,
-  stringToMtree,
-  ipl,
-  bottomUp,
-  sexp,
-) where
+module NinetyNine.P7X where
 
 import Data.Maybe (isNothing, fromJust)
 
@@ -49,7 +41,7 @@ Tree> nnodes tree2
 2
 -}
 
-nnodes :: (Integral b) => Mtree a -> b
+nnodes :: Integral b => Mtree a -> b
 nnodes (Tnode _ ts) = (+1) . sum . map nnodes $ ts
 
 {-
@@ -93,14 +85,16 @@ parseTree (x:s) =
   if any isNothing ts
   then (rs, Nothing)
   else (rs, Just $ Tnode x $ map fromJust ts)
-  where (rs,ts) = parseTrees s
+  where
+    (rs,ts) = parseTrees s
 parseTree _ = ("", Nothing)
 
 parseTrees :: String -> (String, [Maybe (Mtree Char)])
 parseTrees ('^':s) = (s, [])
 parseTrees s = (ors, t : ots)
-  where (rs,t) = parseTree s
-        (ors,ots) = parseTrees rs
+  where
+    (rs,t) = parseTree s
+    (ors,ots) = parseTrees rs
 
 {-
 71. Determine the internal path length of a tree.
@@ -116,7 +110,7 @@ Tree> ipl tree4
 2
 -}
 
-ipl :: (Integral b) => Mtree a -> b
+ipl :: Integral b => Mtree a -> b
 ipl (Tnode _ ts) = sum . map (\t -> ipl t + nnodes t) $ ts
 
 {-
