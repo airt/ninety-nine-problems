@@ -1,4 +1,3 @@
-
 --Problem 54-60
 --https://wiki.haskell.org/99_questions/54A_to_60
 

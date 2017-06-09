@@ -1,4 +1,3 @@
-
 --Problem 1-10
 --https://wiki.haskell.org/99_questions/1_to_10
 

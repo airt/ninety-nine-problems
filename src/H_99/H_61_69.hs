@@ -1,4 +1,3 @@
-
 --Problem 61-69
 --https://wiki.haskell.org/99_questions/61_to_69
 

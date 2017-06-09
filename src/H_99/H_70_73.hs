@@ -1,4 +1,3 @@
-
 --Problem 70-73
 --https://wiki.haskell.org/99_questions/70B_to_73
 

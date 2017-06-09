@@ -1,4 +1,3 @@
-
 --Problem 21-28
 --https://wiki.haskell.org/99_questions/21_to_28
 

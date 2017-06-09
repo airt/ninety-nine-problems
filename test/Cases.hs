@@ -1,6 +1,5 @@
-
-module Tests (
-  tests,
+module Cases (
+  testCases,
 ) where
 
 import Test.HUnit
@@ -296,7 +295,7 @@ test73 = TestCase $ assertEqual "sexp"
   "(a (b c) (d e f) g)"
   $ sexp mtree7
 
-tests =
+testCases =
   TestList [
     test01, test02, test03, test04, test05,
     test06, test07, test08, test09, test10,
@@ -311,5 +310,3 @@ tests =
     test68, test69, test70, test71, test72,
     test73
   ]
-
-rt = runTestTT tests
