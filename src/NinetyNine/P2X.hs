@@ -34,7 +34,6 @@ Prelude> range 4 9
 -}
 
 range :: (Enum a, Ord a) => a -> a -> [a]
-range x y | x > y = []
 range x y = h x y []
   where
     h x y zs
@@ -97,10 +96,10 @@ Example in Haskell:
 
 combinations :: Integral a => a -> [b] -> [[b]]
 combinations 0 __ = [[]]
-combinations n xs = (f =<<) . tails $ xs
+combinations n xs = f =<< tails xs
   where
     f [] = []
-    f (y : ys) = map (y :) . combinations (n - 1) $ ys
+    f (y : ys) = (y :) <$> combinations (n - 1) ys
 
 {-
 27. Group the elements of a set into disjoint subsets.
@@ -143,9 +142,9 @@ P27> group [2,3,4] ["aldo","beat","carla","david","evi",
 
 group' :: (Integral a, Eq b) => [a] -> [b] -> [[[b]]]
 group' [] _ = [[]]
-group' (n : ns) xs = (f =<<) . combinations n $ xs
+group' (n : ns) xs = f =<< combinations n xs
   where
-    f ys = map (ys :) . group' ns $ xs \\ ys
+    f ys = (ys :) <$> group' ns (xs \\ ys)
 
 {-
 28. Sorting a list of lists according to length of sublists

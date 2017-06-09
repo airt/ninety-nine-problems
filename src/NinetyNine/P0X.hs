@@ -16,8 +16,6 @@ Prelude> myLast ['x','y','z']
 'z'
 -}
 
-{-# ANN myLast "HLint: ignore" #-}
-
 myLast :: [a] -> a
 myLast = foldr1 (flip const)
 

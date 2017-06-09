@@ -3,9 +3,9 @@
 
 module NinetyNine.P7X where
 
-import Data.Maybe (isNothing, fromJust)
+import Data.Maybe (fromJust, isNothing)
 
-data Mtree a = Tnode a [Mtree a]
+data MTree a = MTree a [MTree a]
   deriving (Eq, Read, Show)
 
 {-
@@ -41,8 +41,8 @@ Tree> nnodes tree2
 2
 -}
 
-nnodes :: Integral b => Mtree a -> b
-nnodes (Tnode _ ts) = (+1) . sum . map nnodes $ ts
+nnodes :: Integral b => MTree a -> b
+nnodes (MTree _ ts) = (+ 1) . sum . map nnodes $ ts
 
 {-
 70. Tree construction from a node string.
@@ -74,27 +74,27 @@ Tree> treeToString (Node 'a' [Node 'f' [Node 'g' []],
 "afg^^c^bd^e^^^"
 -}
 
-mtreeToString :: Mtree Char -> String
-mtreeToString (Tnode x ts) = [x] ++ concatMap mtreeToString ts ++ "^"
+mtreeToString :: MTree Char -> String
+mtreeToString (MTree x ts) = x : (mtreeToString =<< ts) ++ "^"
 
-stringToMtree :: String -> Maybe (Mtree Char)
+stringToMtree :: String -> Maybe (MTree Char)
 stringToMtree = snd . parseTree
 
-parseTree :: String -> (String, Maybe (Mtree Char))
-parseTree (x:s) =
+parseTree :: String -> (String, Maybe (MTree Char))
+parseTree (x : s) =
   if any isNothing ts
   then (rs, Nothing)
-  else (rs, Just $ Tnode x $ map fromJust ts)
+  else (rs, Just $ MTree x $ map fromJust ts)
   where
-    (rs,ts) = parseTrees s
+    (rs, ts) = parseTrees s
 parseTree _ = ("", Nothing)
 
-parseTrees :: String -> (String, [Maybe (Mtree Char)])
-parseTrees ('^':s) = (s, [])
+parseTrees :: String -> (String, [Maybe (MTree Char)])
+parseTrees ('^' : s) = (s, [])
 parseTrees s = (ors, t : ots)
   where
-    (rs,t) = parseTree s
-    (ors,ots) = parseTrees rs
+    (rs, t) = parseTree s
+    (ors, ots) = parseTrees rs
 
 {-
 71. Determine the internal path length of a tree.
@@ -110,8 +110,8 @@ Tree> ipl tree4
 2
 -}
 
-ipl :: Integral b => Mtree a -> b
-ipl (Tnode _ ts) = sum . map (\t -> ipl t + nnodes t) $ ts
+ipl :: Integral b => MTree a -> b
+ipl (MTree _ ts) = sum . map (\t -> ipl t + nnodes t) $ ts
 
 {-
 72. Construct the bottom-up order sequence of the tree nodes.
@@ -124,8 +124,8 @@ Tree> bottom_up tree5
 "gfcdeba"
 -}
 
-bottomUp :: Mtree a -> [a]
-bottomUp (Tnode x ts) = concatMap bottomUp ts ++ [x]
+bottomUp :: MTree a -> [a]
+bottomUp (MTree x ts) = (bottomUp =<< ts) ++ [x]
 
 {-
 73. Lisp-like tree representation.
@@ -168,8 +168,8 @@ As a second, even more interesting exercise try to rewrite tree_ltl/2
 in a way that the inverse conversion is also possible.
 -}
 
-sexp :: Mtree Char -> String
-sexp (Tnode x ts) =
+sexp :: MTree Char -> String
+sexp (MTree x ts) =
   if null ts
   then [x]
-  else "(" ++ [x] ++ concatMap ((' ':) . sexp) ts ++ ")"
+  else '(' : x : (((' ' :) . sexp) =<< ts) ++ ")"

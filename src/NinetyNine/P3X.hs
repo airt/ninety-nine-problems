@@ -184,9 +184,9 @@ Example in Haskell:
 -}
 
 goldbach :: Integral a => a -> (a, a)
-goldbach x = head . filter (isPrime . snd) . map f . primesR 2 $ x - 1
-  where
-    f y = (y, x - y)
+goldbach x =
+  head . filter (isPrime . snd) .
+  map (id &&& (x -)) . primesR 2 . subtract 1 $ x
 
 {-
 41. Given a range of integers by its lower and upper limit,
@@ -219,7 +219,7 @@ Example in Haskell:
 -}
 
 goldbachList :: Integral a => a -> a -> [(a, a)]
-goldbachList x y = map goldbach . filter even $ [x..y]
+goldbachList x y = goldbach <$> filter even [x..y]
 
 goldbachList' :: Integral a => a -> a -> a -> [(a, a)]
 goldbachList' x y z = filter p $ goldbachList x y

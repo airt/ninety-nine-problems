@@ -3,7 +3,7 @@
 
 module NinetyNine.P5X where
 
-data Btree a = Empty | Branch a (Btree a) (Btree a)
+data BTree a = Empty | Branch a (BTree a) (BTree a)
   deriving (Eq, Read, Show)
 
 {-
@@ -83,14 +83,12 @@ whitespace and "comment diagrams" added for clarity and exposition:
 ]
 -}
 
-cbalTree :: Integral a => a -> [Btree Char]
+cbalTree :: Integral a => a -> [BTree Char]
 cbalTree 0 = [Empty]
 cbalTree n =
-  if m == 0
-  then [ Branch x l r | l <- ts1, r <- ts1 ]
-  else [ Branch x l r | l <- ts1, r <- ts2 ] ++
-       [ Branch x l r | l <- ts2, r <- ts1 ]
+  if m == 0 then h ts1 ts1 else h ts1 ts2 ++ h ts2 ts1
   where
+    h ts1 ts2 = [Branch x l r | l <- ts1, r <- ts2]
     (q, m) = divMod (n - 1) 2
     ts1 = cbalTree q
     ts2 = if m == 0 then ts1 else cbalTree (q + 1)
@@ -114,12 +112,12 @@ False
 True
 -}
 
-mirror :: Btree a -> Btree a -> Bool
+mirror :: BTree a -> BTree a -> Bool
 mirror Empty Empty = True
 mirror (Branch _ xl xr) (Branch _ yl yr) = mirror xl yr && mirror xr yl
 mirror _ _ = False
 
-symmetric :: Btree a -> Bool
+symmetric :: BTree a -> Bool
 symmetric Empty = True
 symmetric (Branch _ l r) = mirror l r
 
@@ -151,14 +149,14 @@ True
 True
 -}
 
-add :: Ord a => a -> Btree a -> Btree a
+add :: Ord a => a -> BTree a -> BTree a
 add x Empty = Branch x Empty Empty
 add x t@(Branch y l r)
-  | x < y     = Branch y (add x l) r
-  | x > y     = Branch y l (add x r)
+  | x < y = Branch y (add x l) r
+  | x > y = Branch y l (add x r)
   | otherwise = t
 
-construct :: Ord a => [a] -> Btree a
+construct :: Ord a => [a] -> BTree a
 construct = foldr add Empty . reverse
 
 {-
@@ -181,7 +179,7 @@ Example in Haskell:
 ]
 -}
 
-symCbalTrees :: Integral a => a -> [Btree Char]
+symCbalTrees :: Integral a => a -> [BTree Char]
 symCbalTrees = filter symmetric . cbalTree
 
 {-

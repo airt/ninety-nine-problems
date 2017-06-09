@@ -3,7 +3,7 @@
 
 module NinetyNine.P4X where
 
-import Control.Arrow (first, second)
+import Control.Arrow ((&&&), (***), first, second)
 import Data.Function (on)
 import Data.List (insertBy, sortOn)
 
@@ -37,20 +37,26 @@ False False False
 equ' :: Bool -> Bool -> Bool
 equ' = (==)
 
+and' :: Bool -> Bool -> Bool
 and' = (&&)
 
+or' :: Bool -> Bool -> Bool
 or' = (||)
 
+nand' :: Bool -> Bool -> Bool
 nand' x y = not $ and' x y
 
-nor'  x y = not $ or' x y
+nor' :: Bool -> Bool -> Bool
+nor' x y = not $ or' x y
 
-xor'  x y = not $ equ' x y
+xor' :: Bool -> Bool -> Bool
+xor' x y = not $ equ' x y
 
+impl' :: Bool -> Bool -> Bool
 impl' x y = or' y $ not x
 
 table :: (Bool -> Bool -> Bool) -> [[Bool]]
-table f = [ [x, y, f x y] | x <- [True, False], y <- [True, False] ]
+table f = [[x, y, f x y] | x <- [True, False], y <- [True, False]]
 
 {-
 47. Truth tables for logical expressions (2).
@@ -124,13 +130,14 @@ False False False False
 -}
 
 genBools :: Integral a => a -> [[Bool]]
-genBools 0 = [[]]
-genBools n = concatMap f . genBools $ n - 1
+genBools = map reverse . h
   where
-    f xs = map (:xs) [True, False]
+    h 0 = [[]]
+    h n = f =<< h (n - 1)
+    f xs = ($ xs) <$> [(True :), (False :)]
 
 tablen :: Integral a => a -> ([Bool] -> Bool) -> [[Bool]]
-tablen n f = map ((\bs -> bs ++ [f bs]) . reverse) . genBools $ n
+tablen n f = (\xs -> xs ++ [f xs]) <$> genBools n
 
 {-
 49. Gray codes.
@@ -153,9 +160,9 @@ P49> gray 3
 
 gray :: Integral a => a -> [String]
 gray 0 = [""]
-gray x = map ('0':) xs ++ map ('1':) (reverse xs)
-  where
-    xs = gray (x - 1)
+gray x =
+  uncurry (++) . (map ('0' :) *** map ('1' :)) .
+  (id &&& reverse) . gray . subtract 1 $ x
 
 {-
 50. Huffman codes.
@@ -173,27 +180,27 @@ Example in Haskell:
 [('a',"0"),('b',"101"),('c',"100"),('d',"111"),('e',"1101"),('f',"1100")]
 -}
 
-data Htree a = Leaf a | HBranch (Htree a) (Htree a)
+data HTree a = HLeaf a | HBranch (HTree a) (HTree a)
   deriving (Eq, Read, Show)
 
-insertOn :: Ord b => (a -> b) -> a -> [a] -> [a]
-insertOn f = insertBy (compare `on` f)
-
-htree :: (Ord b, Num b) => [(Htree a, b)] -> Htree a
-htree [(t,w)] = t
-htree (x1:x2:xs) = htree . insertOn snd (merge x1 x2) $ xs
-
-merge :: Num b => (Htree a, b) -> (Htree a, b) -> (Htree a, b)
-merge (t1,w1) (t2,w2) = (HBranch t1 t2, w1 + w2)
-
-serialize :: Htree a -> [(a, String)]
-serialize (Leaf x) = [(x, [])]
-serialize (HBranch l r) = concatMap f [('0', l), ('1', r)]
-  where
-    f (b,t) = map (second (b :)) . serialize $ t
-
-huffman :: (Ord a, Ord b, Num b) => [(a,b)] -> [(a,String)]
+huffman :: (Ord a, Ord b, Num b) => [(a, b)] -> [(a, String)]
 huffman = sortOn fst . serialize . htree . leaves
   where
-    leaves :: (Ord b, Num b) => [(a, b)] -> [(Htree a, b)]
-    leaves = sortOn snd . map (first Leaf)
+    leaves :: (Ord b, Num b) => [(a, b)] -> [(HTree a, b)]
+    leaves = sortOn snd . map (first HLeaf)
+
+    htree :: (Ord b, Num b) => [(HTree a, b)] -> HTree a
+    htree [(t, _)] = t
+    htree (x1 : x2 : xs) = htree . insertOn snd (merge x1 x2) $ xs
+
+    merge :: Num b => (HTree a, b) -> (HTree a, b) -> (HTree a, b)
+    merge (t1, w1) (t2, w2) = (HBranch t1 t2, w1 + w2)
+
+    insertOn :: Ord b => (a -> b) -> a -> [a] -> [a]
+    insertOn = insertBy . (compare `on`)
+
+    serialize :: HTree a -> [(a, String)]
+    serialize (HLeaf x) = [(x, [])]
+    serialize (HBranch l r) = f =<< [(l, '0'), (r, '1')]
+      where
+        f (t, b) = second (b :) <$> serialize t

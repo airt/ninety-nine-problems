@@ -3,8 +3,8 @@
 
 module NinetyNine.P6X where
 
-import Data.Maybe (isNothing, fromJust)
-import NinetyNine.P5X (Btree(..))
+import Data.Maybe (fromJust, isNothing)
+import NinetyNine.P5X (BTree(..))
 
 {-
 61. Count the leaves of a binary tree.
@@ -20,10 +20,10 @@ Example in Haskell:
 2
 -}
 
-countLeaves :: Integral b => Btree a -> b
+countLeaves :: Integral b => BTree a -> b
 countLeaves Empty = 0
 countLeaves (Branch _ Empty Empty) = 1
-countLeaves (Branch _ l r) = sum . map countLeaves $ [l, r]
+countLeaves (Branch _ l r) = sum $ countLeaves <$> [l, r]
 
 {-
 61A. Collect the leaves of a binary tree in a list.
@@ -39,10 +39,10 @@ Example in Haskell:
 [4,2]
 -}
 
-leaves :: Btree a -> [a]
+leaves :: BTree a -> [a]
 leaves Empty = []
 leaves (Branch x Empty Empty) = [x]
-leaves (Branch x l r) = concatMap leaves [l, r]
+leaves (Branch _ l r) = leaves =<< [l, r]
 
 {-
 62. Collect the internal nodes of a binary tree in a list.
@@ -58,10 +58,10 @@ Prelude> internals tree4
 Prelude> [1,2]
 -}
 
-internals :: Btree a -> [a]
+internals :: BTree a -> [a]
 internals Empty = []
-internals (Branch x Empty Empty) = []
-internals (Branch x l r) = x : concatMap internals [l, r]
+internals (Branch _ Empty Empty) = []
+internals (Branch x l r) = x : (internals =<< [l, r])
 
 {-
 62B. Collect the nodes at a given level in a list.
@@ -78,10 +78,10 @@ Prelude> atLevel tree4 2
 Prelude> [2,2]
 -}
 
-atLevel :: Integral b => Btree a -> b -> [a]
-atLevel Empty n = []
-atLevel (Branch x l r) 1 = [x]
-atLevel (Branch x l r) n = concatMap (`atLevel` (n - 1)) [l, r]
+atLevel :: Integral b => BTree a -> b -> [a]
+atLevel Empty _ = []
+atLevel (Branch x _ _) 1 = [x]
+atLevel (Branch _ l r) n = flip atLevel (n - 1) =<< [l, r]
 
 {-
 63. Construct a complete binary tree.
@@ -116,26 +116,26 @@ Main> isCompleteBinaryTree $ Branch 'x' (Branch 'x' Empty Empty)
 True
 -}
 
-buildCBT :: Integral b => a -> b -> b -> Btree a
+buildCBT :: Integral b => a -> b -> b -> BTree a
 buildCBT x n i =
   if n - i < 0
   then Empty
-  else Branch x (buildCBT x n $ i * 2 ) (buildCBT x n $ i * 2 + 1)
+  else Branch x (buildCBT x n $ i * 2) (buildCBT x n $ i * 2 + 1)
 
-completeBinaryTree :: Integral a => a -> Btree Char
+completeBinaryTree :: Integral a => a -> BTree Char
 completeBinaryTree n = buildCBT 'x' n 1
 
-isomorphism :: Btree a -> Btree b -> Bool
+isomorphism :: BTree a -> BTree b -> Bool
 isomorphism Empty Empty = True
 isomorphism (Branch _ xl xr) (Branch _ yl yr) =
-            isomorphism xl yl && isomorphism xr yr
+  isomorphism xl yl && isomorphism xr yr
 isomorphism _ _ = False
 
-countNodes :: Integral b => Btree a -> b
+countNodes :: Integral b => BTree a -> b
 countNodes Empty = 0
-countNodes (Branch _ l r) = (+1) . sum . map countNodes $ [l, r]
+countNodes (Branch _ l r) = (+ 1) . sum . map countNodes $ [l, r]
 
-isCompleteBinaryTree :: Btree a -> Bool
+isCompleteBinaryTree :: BTree a -> Bool
 isCompleteBinaryTree t = isomorphism t . completeBinaryTree . countNodes $ t
 
 {-
@@ -183,14 +183,14 @@ Branch ('n',(8,1)) (Branch ('k',(6,2)) (Branch ('c',(2,3)) ...
 -- y: available row index
 -- fst tupleReturned: tree with position
 -- snd tupleReturned: next available column index
-layout' :: Integral b => (b, b) -> Btree a -> (Btree (a, (b, b)), b)
-layout' (x,y) Empty = (Empty, x)
-layout' (x,y) (Branch a l r) = (Branch (a, (nl, y)) ll lr, nr)
+layout' :: Integral b => (b, b) -> BTree a -> (BTree (a, (b, b)), b)
+layout' (x, _) Empty = (Empty, x)
+layout' (x, y) (Branch v l r) = (Branch (v, (nl, y)) ll lr, nr)
   where
-    (ll, nl) = layout' (x     , y + 1) l
+    (ll, nl) = layout' (x, y + 1) l
     (lr, nr) = layout' (nl + 1, y + 1) r
 
-layout :: Integral b => Btree a -> Btree (a, (b, b))
+layout :: Integral b => BTree a -> BTree (a, (b, b))
 layout = fst . layout' (1, 1)
 
 {-
@@ -274,27 +274,27 @@ Main> let t = cbtFromList ['a'..'z']
 True
 -}
 
-treeToString :: Btree Char -> String
+treeToString :: BTree Char -> String
 treeToString Empty = ""
 treeToString (Branch x Empty Empty) = [x]
 treeToString (Branch x l r) =
-  [x] ++ "(" ++ treeToString l ++ "," ++ treeToString r ++ ")"
+  x : '(' : treeToString l ++ "," ++ treeToString r ++ ")"
 
-stringToTree :: String -> Maybe (Btree Char)
+stringToTree :: String -> Maybe (BTree Char)
 stringToTree = snd . parseTree
 
-parseTree :: String -> (String, Maybe (Btree Char))
-parseTree (',':s) = (s, Just Empty)
-parseTree (')':s) = (s, Just Empty)
-parseTree (x:',':s) = (s, Just $ Branch x Empty Empty)
-parseTree (x:')':s) = (s, Just $ Branch x Empty Empty)
-parseTree (x:'(':s) =
+parseTree :: String -> (String, Maybe (BTree Char))
+parseTree (',' : s) = (s, Just Empty)
+parseTree (')' : s) = (s, Just Empty)
+parseTree (x : ',' : s) = (s, Just $ Branch x Empty Empty)
+parseTree (x : ')' : s) = (s, Just $ Branch x Empty Empty)
+parseTree (x : '(' : s) =
   if any isNothing [l, r]
   then (tail sr, Nothing)
   else (tail sr, Just $ Branch x (fromJust l) (fromJust r))
   where
-    (sl,l) = parseTree s
-    (sr,r) = parseTree sl
+    (sl, l) = parseTree s
+    (sr, r) = parseTree sl
 parseTree _ = ("", Nothing)
 
 {-
@@ -322,11 +322,11 @@ Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty))
            (Branch 'c' Empty (Branch 'f' (Branch 'g' Empty Empty) Empty))
 -}
 
-preorder :: Btree Char -> String
+preorder :: BTree Char -> String
 preorder Empty = ""
-preorder (Branch x l r) = [x] ++ preorder l ++ preorder r
+preorder (Branch x l r) = x : preorder l ++ preorder r
 
-inorder :: Btree Char -> String
+inorder :: BTree Char -> String
 inorder Empty = ""
 inorder (Branch x l r) = inorder l ++ [x] ++ inorder r
 
@@ -351,20 +351,20 @@ Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty))
 "xy..z0..."
 -}
 
-tree2ds :: Btree Char -> String
+tree2ds :: BTree Char -> String
 tree2ds Empty = "."
-tree2ds (Branch x l r) = [x] ++ tree2ds l ++ tree2ds r
+tree2ds (Branch x l r) = x : tree2ds l ++ tree2ds r
 
-ds2tree :: String -> Maybe (Btree Char)
+ds2tree :: String -> Maybe (BTree Char)
 ds2tree = snd . parseDs
 
-parseDs :: String -> (String, Maybe (Btree Char))
-parseDs ('.':s) = (s, Just Empty)
-parseDs (x:s) =
+parseDs :: String -> (String, Maybe (BTree Char))
+parseDs ('.' : s) = (s, Just Empty)
+parseDs (x : s) =
   if any isNothing [l, r]
   then (sr, Nothing)
   else (sr, Just $ Branch x (fromJust l) (fromJust r))
   where
-    (sl,l) = parseDs s
-    (sr,r) = parseDs sl
+    (sl, l) = parseDs s
+    (sr, r) = parseDs sl
 parseDs _ = ("", Nothing)

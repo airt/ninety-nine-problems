@@ -79,8 +79,8 @@ case12 = TestCase $ assertEqual
 
 case13 = TestCase $ assertEqual
   "encodeDirect" [
-    Multiple 4 'a',Single 'b',Multiple 2 'c',
-    Multiple 2 'a',Single 'd',Multiple 4 'e'
+    Multiple 4 'a', Single 'b', Multiple 2 'c',
+    Multiple 2 'a', Single 'd', Multiple 4 'e'
   ] $
   encodeDirect "aaaabccaadeeee"
 
@@ -145,7 +145,7 @@ case27 = TestCase $ assertEqual
     ["aldo", "beat", "carla", "david", "evi", "flip", "gary", "hugo", "ida"]
 
 case28 = TestCase $ assertEqual
-  "(lsort,lfsort)" (
+  "(lsort, lfsort)" (
     ["o", "de", "de", "mn", "abc", "fgh", "ijkl"],
     ["ijkl", "o", "abc", "fgh", "de", "de", "mn"]
   ) (
@@ -392,10 +392,10 @@ case69 = TestCase $ assertEqual
   (tree2ds bTree5, ds2tree "ab.d..ce...")
 
 mTree7 =
-  Tnode 'a' [
-    Tnode 'b' [Tnode 'c' []],
-    Tnode 'd' [Tnode 'e' [], Tnode 'f' []],
-    Tnode 'g' []
+  MTree 'a' [
+    MTree 'b' [MTree 'c' []],
+    MTree 'd' [MTree 'e' [], MTree 'f' []],
+    MTree 'g' []
   ]
 
 case70 = TestCase $ assertEqual
