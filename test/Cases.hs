@@ -12,6 +12,8 @@ import NinetyNine.P6X
 import NinetyNine.P7X
 import Test.HUnit
 
+emptyTestCase = TestCase $ assertBool "" True
+
 case01 = TestCase $ assertEqual
   "myLast"
   9 $
@@ -153,9 +155,9 @@ case28 = TestCase $ assertEqual
     lfsort ["abc", "de", "fgh", "de", "ijkl", "mn", "o"]
   )
 
-case29 = TestCase $ assertBool "29" True
+case29 = emptyTestCase
 
-case30 = TestCase $ assertBool "30" True
+case30 = emptyTestCase
 
 case31 = TestCase $ assertEqual
   "isPrime"
@@ -212,6 +214,14 @@ case41 = TestCase $ assertEqual
   [(3, 7), (5, 7), (3, 11), (3, 13), (5, 13), (3, 17)] $
   goldbachList 9 20
 
+case42 = emptyTestCase
+
+case43 = emptyTestCase
+
+case44 = emptyTestCase
+
+case45 = emptyTestCase
+
 case46 = TestCase $ assertEqual
   "table" [
     [True , True , True ],
@@ -257,6 +267,12 @@ case50 = TestCase $ assertEqual
     ('a', 45), ('b', 13), ('c', 12),
     ('d', 16), ('e', 9), ('f', 5)
   ]
+
+case51 = emptyTestCase
+
+case52 = emptyTestCase
+
+case53 = emptyTestCase
 
 case55 = TestCase $ assertEqual
   "cbalTree" [
@@ -418,6 +434,18 @@ case73 = TestCase $ assertEqual
   "(a (b c) (d e f) g)" $
   sexp mTree7
 
+case74 = emptyTestCase
+
+case75 = emptyTestCase
+
+case76 = emptyTestCase
+
+case77 = emptyTestCase
+
+case78 = emptyTestCase
+
+case79 = emptyTestCase
+
 testCases =
   TestList [
     case01, case02, case03, case04, case05,
@@ -428,11 +456,12 @@ testCases =
     case26, case27, case28, case29, case30,
     case31, case32, case33, case34, case35,
     case36, case37, case38, case39, case40,
-    case41,
+    case41, case42, case43, case44, case45,
     case46, case47, case48, case49, case50,
-    case55,
+    case51, case52, case53, case55,
     case56, case57, case58,
     case61, case62, case63, case64,
     case67, case68, case69, case70,
-    case71, case72, case73
+    case71, case72, case73, case74, case75,
+    case76, case77, case78, case79
   ]

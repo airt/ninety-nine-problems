@@ -7,13 +7,17 @@
 
 ## progress
 
-- 70 - 73 (2016-01-18)
-- 61 - 69 (2016-01-17)
-- 55 - 58 (2016-01-16)
-- 46 - 50 (2016-01-15)
-- 26 - 41 (2016-01-14)
-- 11 - 22 (2016-01-12)
-- 01 - 10 (2016-01-11)
+- [x] 01 to 10: lists
+- [x] 11 to 20: lists, continued
+- [ ] 21 to 28: lists again
+- [x] 31 to 41: arithmetic
+- [x] 46 to 50: logic and codes
+- [ ] 54 to 60: binary trees
+- [ ] 61 to 69: binary trees, continued
+- [x] 70 to 73: multiway trees
+- [ ] 80 to 89: graphs
+- [ ] 90 to 94: miscellaneous problems
+- [ ] 95 to 99: miscellaneous problems, continued
 
 [build-badge]: https://img.shields.io/travis/airt/ninety-nine-problems.svg
 [build-status]: https://travis-ci.org/airt/ninety-nine-problems
