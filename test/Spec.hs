@@ -1,4 +1,4 @@
-import Cases (testCases)
-import Test.HUnit
+import Test.HUnit (runTestTT)
+import Cases (testcases)
 
-main = runTestTT testCases
+main = runTestTT testcases

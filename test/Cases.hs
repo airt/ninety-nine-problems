@@ -1,10 +1,10 @@
 module Cases (
-  testCases,
+  testcases,
 ) where
 
 import Data.List (nub, sort)
 import System.Random (getStdGen)
-import Test.HUnit
+import Test.HUnit (Test(..), assertBool, assertEqual)
 import NinetyNine.P0X
 import NinetyNine.P1X
 import NinetyNine.P2X
@@ -467,7 +467,7 @@ case78 = emptyTestCase
 
 case79 = emptyTestCase
 
-testCases =
+testcases =
   TestList [
     case01, case02, case03, case04, case05,
     case06, case07, case08, case09, case10,
