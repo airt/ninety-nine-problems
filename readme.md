@@ -1,7 +1,7 @@
 # ninety-nine-problems
 
 [![Build Status][build-badge]][build-status]
-[![Code Climate][codeclimate-badge]][codeclimate-status]
+<!-- [![Code Climate][codeclimate-badge]][codeclimate-status] -->
 
 [Ninety-Nine Haskell Problems](https://wiki.haskell.org/H-99:_Ninety-Nine_Haskell_Problems)
 
