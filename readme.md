@@ -1,7 +1,7 @@
 # ninety-nine-problems
 
 [![Build Status][build-badge]][build-status]
-<!-- [![Code Climate][codeclimate-badge]][codeclimate-status] -->
+[![Code Climate][codeclimate-badge]][codeclimate-status]
 
 [Ninety-Nine Haskell Problems](https://wiki.haskell.org/H-99:_Ninety-Nine_Haskell_Problems)
 
@@ -21,5 +21,5 @@
 
 [build-badge]: https://img.shields.io/travis/airt/ninety-nine-problems.svg
 [build-status]: https://travis-ci.org/airt/ninety-nine-problems
-[codeclimate-badge]: https://img.shields.io/codeclimate/github/airt/ninety-nine-problems.svg
+[codeclimate-badge]: https://img.shields.io/codeclimate/maintainability/airt/ninety-nine-problems.svg
 [codeclimate-status]: https://codeclimate.com/github/airt/ninety-nine-problems
