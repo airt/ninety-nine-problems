@@ -129,14 +129,14 @@ False False True  False
 False False False False
 -}
 
-genBools :: Integral a => a -> [[Bool]]
+genBools :: Integral n => n -> [[Bool]]
 genBools = map reverse . h
   where
     h 0 = [[]]
-    h n = f =<< h (n - 1)
+    h n = f =<< h (pred n)
     f xs = ($ xs) <$> [(True :), (False :)]
 
-tablen :: Integral a => a -> ([Bool] -> Bool) -> [[Bool]]
+tablen :: Integral n => n -> ([Bool] -> Bool) -> [[Bool]]
 tablen n f = (\xs -> xs ++ [f xs]) <$> genBools n
 
 {-
@@ -158,7 +158,7 @@ P49> gray 3
 ["000","001","011","010","110","111","101","100"]
 -}
 
-gray :: Integral a => a -> [String]
+gray :: Integral n => n -> [String]
 gray 0 = [""]
 gray x =
   uncurry (++) . (map ('0' :) *** map ('1' :)) .
@@ -183,17 +183,17 @@ Example in Haskell:
 data HTree a = HLeaf a | HBranch (HTree a) (HTree a)
   deriving (Eq, Read, Show)
 
-huffman :: (Ord a, Ord b, Num b) => [(a, b)] -> [(a, String)]
+huffman :: (Ord a, Ord n, Num n) => [(a, n)] -> [(a, String)]
 huffman = sortOn fst . serialize . htree . leaves
   where
-    leaves :: (Ord b, Num b) => [(a, b)] -> [(HTree a, b)]
+    leaves :: (Ord n, Num n) => [(a, n)] -> [(HTree a, n)]
     leaves = sortOn snd . map (first HLeaf)
 
-    htree :: (Ord b, Num b) => [(HTree a, b)] -> HTree a
+    htree :: (Ord n, Num n) => [(HTree a, n)] -> HTree a
     htree [(t, _)] = t
     htree (x1 : x2 : xs) = htree . insertOn snd (merge x1 x2) $ xs
 
-    merge :: Num b => (HTree a, b) -> (HTree a, b) -> (HTree a, b)
+    merge :: Num n => (HTree a, n) -> (HTree a, n) -> (HTree a, n)
     merge (t1, w1) (t2, w2) = (HBranch t1 t2, w1 + w2)
 
     insertOn :: Ord b => (a -> b) -> a -> [a] -> [a]

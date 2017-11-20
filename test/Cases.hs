@@ -135,21 +135,21 @@ case22 = TestCase $ assertEqual
 
 case23 = TestCase $ do
   gen <- getStdGen
-  let rs = rndSelect 5 [1..10] gen
+  let rs = rndSelect 5 [1..10] gen :: [Int]
   assertEqual "rndSelect" 5 $ length rs
   assertEqual "rndSelect" 5 $ length (nub rs)
   assertBool "rndSelect" $ all (`elem` [1..10]) rs
 
 case24 = TestCase $ do
   gen <- getStdGen
-  let rs = diffSelect 5 10 gen
+  let rs = diffSelect 5 10 gen :: [Int]
   assertEqual "diffSelect" 5 $ length rs
   assertEqual "diffSelect" 5 $ length (nub rs)
   assertBool "diffSelect" $ all (`elem` [1..10]) rs
 
 case25 = TestCase $ do
   gen <- getStdGen
-  let rs = rndPermutation [1..10] gen
+  let rs = rndPermutation [1..10] gen :: [Int]
   assertEqual "rndPermutation" [1..10] $ sort rs
 
 case26 = TestCase $ assertEqual

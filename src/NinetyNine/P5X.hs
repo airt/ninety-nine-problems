@@ -83,15 +83,15 @@ whitespace and "comment diagrams" added for clarity and exposition:
 ]
 -}
 
-cbalTree :: Integral a => a -> [BTree Char]
+cbalTree :: Integral n => n -> [BTree Char]
 cbalTree 0 = [Empty]
 cbalTree n =
   if m == 0 then h ts1 ts1 else h ts1 ts2 ++ h ts2 ts1
   where
     h ts1 ts2 = [Branch x l r | l <- ts1, r <- ts2]
-    (q, m) = divMod (n - 1) 2
+    (q, m) = divMod (pred n) 2
     ts1 = cbalTree q
-    ts2 = if m == 0 then ts1 else cbalTree (q + 1)
+    ts2 = if m == 0 then ts1 else cbalTree (succ q)
     x = 'x'
 
 {-
@@ -179,7 +179,7 @@ Example in Haskell:
 ]
 -}
 
-symCbalTrees :: Integral a => a -> [BTree Char]
+symCbalTrees :: Integral n => n -> [BTree Char]
 symCbalTrees = filter symmetric . cbalTree
 
 {-

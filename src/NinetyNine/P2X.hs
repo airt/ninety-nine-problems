@@ -5,7 +5,7 @@ module NinetyNine.P2X where
 
 import Control.Arrow (second)
 import Data.List ((\\), nub, sortOn, tails)
-import System.Random (StdGen, randomR, randomRs)
+import System.Random (Random, RandomGen, randomR, randomRs)
 import NinetyNine.P1X (removeAt)
 
 {-
@@ -21,7 +21,7 @@ P21> insertAt 'X' "abcd" 2
 -}
 
 insertAt :: a -> [a] -> Int -> [a]
-insertAt x xs n = uncurry (++) . second (x :) . splitAt (n - 1) $ xs
+insertAt x xs n = uncurry (++) . second (x :) . splitAt (pred n) $ xs
 
 {-
 22. Create a list containing all integers within a given range.
@@ -54,10 +54,10 @@ Prelude System.Random>rnd_select "abcdefgh" 3 >>= putStrLn
 eda
 -}
 
-rndSelect :: Int -> [a] -> StdGen -> [a]
+rndSelect :: RandomGen g => Int -> [a] -> g -> [a]
 rndSelect n xs gen = (xs !!) . pred <$> diffSelect n (length xs) gen
 
-rndSelect' :: Int -> [a] -> StdGen -> [a]
+rndSelect' :: RandomGen g => Int -> [a] -> g -> [a]
 rndSelect' = h []
   where
     h rs n xs gen
@@ -79,7 +79,7 @@ Prelude System.Random>diff_select 6 49
 Prelude System.Random>[23,1,17,33,21,37]
 -}
 
-diffSelect :: Int -> Int -> StdGen -> [Int]
+diffSelect :: (Integral n, Random n, RandomGen g) => Int -> n -> g -> [n]
 diffSelect n m = take n . nub . randomRs (1, m)
 
 {-
@@ -94,7 +94,7 @@ Prelude System.Random>rnd_permu "abcdef"
 Prelude System.Random>"badcef"
 -}
 
-rndPermutation :: [a] -> StdGen -> [a]
+rndPermutation :: RandomGen g => [a] -> g -> [a]
 rndPermutation xs = rndSelect (length xs) xs
 
 {-
@@ -115,12 +115,12 @@ Example in Haskell:
 ["abc","abd","abe",...]
 -}
 
-combinations :: Integral a => a -> [b] -> [[b]]
+combinations :: Integral n => n -> [a] -> [[a]]
 combinations 0 __ = [[]]
 combinations n xs = f =<< tails xs
   where
     f [] = []
-    f (y : ys) = (y :) <$> combinations (n - 1) ys
+    f (y : ys) = (y :) <$> combinations (pred n) ys
 
 {-
 27. Group the elements of a set into disjoint subsets.
@@ -161,7 +161,7 @@ P27> group [2,3,4] ["aldo","beat","carla","david","evi",
 (altogether 756 solutions)
 -}
 
-group' :: (Integral a, Eq b) => [a] -> [b] -> [[[b]]]
+group' :: (Integral n, Eq a) => [n] -> [a] -> [[[a]]]
 group' [] _ = [[]]
 group' (n : ns) xs = f =<< combinations n xs
   where

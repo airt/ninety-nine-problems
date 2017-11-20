@@ -20,7 +20,7 @@ Example in Haskell:
 2
 -}
 
-countLeaves :: Integral b => BTree a -> b
+countLeaves :: Integral n => BTree a -> n
 countLeaves Empty = 0
 countLeaves (Branch _ Empty Empty) = 1
 countLeaves (Branch _ l r) = sum $ countLeaves <$> [l, r]
@@ -78,10 +78,10 @@ Prelude> atLevel tree4 2
 Prelude> [2,2]
 -}
 
-atLevel :: Integral b => BTree a -> b -> [a]
+atLevel :: Integral n => BTree a -> n -> [a]
 atLevel Empty _ = []
 atLevel (Branch x _ _) 1 = [x]
-atLevel (Branch _ l r) n = flip atLevel (n - 1) =<< [l, r]
+atLevel (Branch _ l r) n = flip atLevel (pred n) =<< [l, r]
 
 {-
 63. Construct a complete binary tree.
@@ -116,13 +116,13 @@ Main> isCompleteBinaryTree $ Branch 'x' (Branch 'x' Empty Empty)
 True
 -}
 
-buildCBT :: Integral b => a -> b -> b -> BTree a
+buildCBT :: Integral n => a -> n -> n -> BTree a
 buildCBT x n i =
   if n - i < 0
   then Empty
   else Branch x (buildCBT x n $ i * 2) (buildCBT x n $ i * 2 + 1)
 
-completeBinaryTree :: Integral a => a -> BTree Char
+completeBinaryTree :: Integral n => n -> BTree Char
 completeBinaryTree n = buildCBT 'x' n 1
 
 isomorphism :: BTree a -> BTree b -> Bool
@@ -131,9 +131,9 @@ isomorphism (Branch _ xl xr) (Branch _ yl yr) =
   isomorphism xl yl && isomorphism xr yr
 isomorphism _ _ = False
 
-countNodes :: Integral b => BTree a -> b
+countNodes :: Integral n => BTree a -> n
 countNodes Empty = 0
-countNodes (Branch _ l r) = (+ 1) . sum . map countNodes $ [l, r]
+countNodes (Branch _ l r) = succ . sum . map countNodes $ [l, r]
 
 isCompleteBinaryTree :: BTree a -> Bool
 isCompleteBinaryTree t = isomorphism t . completeBinaryTree . countNodes $ t
@@ -183,14 +183,14 @@ Branch ('n',(8,1)) (Branch ('k',(6,2)) (Branch ('c',(2,3)) ...
 -- y: available row index
 -- fst tupleReturned: tree with position
 -- snd tupleReturned: next available column index
-layout' :: Integral b => (b, b) -> BTree a -> (BTree (a, (b, b)), b)
+layout' :: Integral n => (n, n) -> BTree a -> (BTree (a, (n, n)), n)
 layout' (x, _) Empty = (Empty, x)
 layout' (x, y) (Branch v l r) = (Branch (v, (nl, y)) ll lr, nr)
   where
-    (ll, nl) = layout' (x, y + 1) l
-    (lr, nr) = layout' (nl + 1, y + 1) r
+    (ll, nl) = layout' (x, succ y) l
+    (lr, nr) = layout' (succ nl, succ y) r
 
-layout :: Integral b => BTree a -> BTree (a, (b, b))
+layout :: Integral n => BTree a -> BTree (a, (n, n))
 layout = fst . layout' (1, 1)
 
 {-

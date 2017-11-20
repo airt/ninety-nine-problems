@@ -41,8 +41,8 @@ Tree> nnodes tree2
 2
 -}
 
-nnodes :: Integral b => MTree a -> b
-nnodes (MTree _ ts) = (+ 1) . sum . map nnodes $ ts
+nnodes :: Integral n => MTree a -> n
+nnodes (MTree _ ts) = succ . sum . map nnodes $ ts
 
 {-
 70. Tree construction from a node string.
@@ -110,7 +110,7 @@ Tree> ipl tree4
 2
 -}
 
-ipl :: Integral b => MTree a -> b
+ipl :: Integral n => MTree a -> n
 ipl (MTree _ ts) = sum . map (\t -> ipl t + nnodes t) $ ts
 
 {-

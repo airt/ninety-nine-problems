@@ -50,9 +50,9 @@ Prelude> elementAt "haskell" 5
 'e'
 -}
 
-elementAt :: Integral b => [a] -> b -> a
+elementAt :: Integral n => [a] -> n -> a
 elementAt (x : __) 1 = x
-elementAt (_ : xs) n = elementAt xs (n - 1)
+elementAt (_ : xs) n = elementAt xs $ pred n
 elementAt _ _ = error "elementAt: index out of bounds"
 
 {-
@@ -65,7 +65,7 @@ Prelude> myLength "Hello, world!"
 13
 -}
 
-myLength :: Integral b => [a] -> b
+myLength :: Integral n => [a] -> n
 myLength = sum . map (const 1)
 
 {-

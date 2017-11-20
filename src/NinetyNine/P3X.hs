@@ -18,12 +18,12 @@ P31> isPrime 7
 True
 -}
 
-primes :: Integral a => [a]
+primes :: Integral n => [n]
 primes = sieve [2..]
   where
     sieve (x : xs) = x : sieve [ y | y <- xs, rem y x /= 0 ]
 
-isPrime :: Integral a => a -> Bool
+isPrime :: Integral n => n -> Bool
 isPrime x = (== x) . head . dropWhile (< x) $ primes
 
 {-
@@ -39,7 +39,7 @@ Example in Haskell:
 [9,3,3]
 -}
 
-myGCD :: Integral a => a -> a -> a
+myGCD :: Integral n => n -> n -> n
 myGCD x y | x < 0 = myGCD (abs x) y
 myGCD x y | y < 0 = myGCD x (abs y)
 myGCD 0 y = y
@@ -58,7 +58,7 @@ Example in Haskell:
 True
 -}
 
-coprime :: Integral a => a -> a -> Bool
+coprime :: Integral n => n -> n -> Bool
 coprime x y = gcd x y == 1
 
 {-
@@ -80,7 +80,7 @@ Example in Haskell:
 4
 -}
 
-totient :: Integral a => a -> Int
+totient :: Integral n => n -> Int
 totient x = length . filter (coprime x) $ [1..x]
 
 {-
@@ -96,7 +96,7 @@ Example in Haskell:
 [3, 3, 5, 7]
 -}
 
-primeFactors :: Integral a => a -> [a]
+primeFactors :: Integral n => n -> [n]
 primeFactors = reverse . h []
   where
     h rs x
@@ -117,7 +117,7 @@ Example in Haskell:
 [(3,2),(5,1),(7,1)]
 -}
 
-primeFactorsMult :: Integral a => a -> [(a, Int)]
+primeFactorsMult :: Integral n => n -> [(n, Int)]
 primeFactorsMult = map (head &&& length) . group . primeFactors
 
 {-
@@ -137,7 +137,7 @@ phi(m) = (p1 - 1) * p1 ** (m1 - 1) *
 Note that a ** b stands for the b'th power of a.
 -}
 
-totient' :: Integral a => a -> a
+totient' :: Integral n => n -> n
 totient' = product . map f . primeFactorsMult
   where
     f (p, m) = (p - 1) * p ^ (m - 1)
@@ -159,7 +159,7 @@ P29> primesR 10 20
 [11,13,17,19]
 -}
 
-primesR :: Integral a => a -> a -> [a]
+primesR :: Integral n => n -> n -> [n]
 primesR a b = takeWhile (<= b) . dropWhile (< a) $ primes
 
 {-
@@ -183,7 +183,7 @@ Example in Haskell:
 (5, 23)
 -}
 
-goldbach :: Integral a => a -> (a, a)
+goldbach :: Integral n => n -> (n, n)
 goldbach x =
   head . filter (isPrime . snd) .
   map (id &&& (x -)) . primesR 2 . subtract 1 $ x
@@ -218,10 +218,10 @@ Example in Haskell:
 [(73,919),(61,1321),(67,1789),(61,1867)]
 -}
 
-goldbachList :: Integral a => a -> a -> [(a, a)]
+goldbachList :: Integral n => n -> n -> [(n, n)]
 goldbachList x y = goldbach <$> filter even [x..y]
 
-goldbachList' :: Integral a => a -> a -> a -> [(a, a)]
+goldbachList' :: Integral n => n -> n -> n -> [(n, n)]
 goldbachList' x y z = filter p $ goldbachList x y
   where
     p (a, b) = all (> z) [a, b]

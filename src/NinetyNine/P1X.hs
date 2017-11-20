@@ -72,7 +72,7 @@ encodeDirect = foldr f []
     f x (Single y : zs)
       | x == y = Multiple 2 x : zs
     f x (Multiple n y : zs)
-      | x == y = Multiple (n + 1) x : zs
+      | x == y = Multiple (succ n) x : zs
     f x zs = Single x : zs
 
 {-
@@ -117,7 +117,7 @@ Example in Haskell:
 "abdeghk"
 -}
 
-dropEvery :: Integral b => [a] -> b -> [a]
+dropEvery :: Integral n => [a] -> n -> [a]
 dropEvery xs n = [x | (i, x) <- zip [1..] xs, mod i n /= 0]
 
 {-
@@ -133,7 +133,7 @@ Example in Haskell:
 ("abc", "defghik")
 -}
 
-split :: Integral b => [a] -> b -> ([a], [a])
+split :: Integral n => [a] -> n -> ([a], [a])
 split xs n = foldr f ([], []) . zip [1..] $ xs
   where
     f (i, x) (ys, zs)
@@ -156,7 +156,7 @@ Example in Haskell:
 -}
 
 slice :: [a] -> Int -> Int -> [a]
-slice xs i k = take (k - i + 1) . drop (i - 1) $ xs
+slice xs i k = take (k - i + 1) . drop (pred i) $ xs
 
 {-
 19. Rotate a list N places to the left.
@@ -197,7 +197,7 @@ Example in Haskell:
 ('b',"acd")
 -}
 
-removeAt :: Integral b => b -> [a] -> (a, [a])
+removeAt :: Integral n => n -> [a] -> (a, [a])
 removeAt k xs = foldr f (head xs, []) . zip [1..] $ xs
   where
     f (i, x) (z, zs)
