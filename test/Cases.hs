@@ -2,6 +2,9 @@ module Cases (
   testCases,
 ) where
 
+import Data.List (nub, sort)
+import System.Random (getStdGen)
+import Test.HUnit
 import NinetyNine.P0X
 import NinetyNine.P1X
 import NinetyNine.P2X
@@ -10,7 +13,6 @@ import NinetyNine.P4X
 import NinetyNine.P5X
 import NinetyNine.P6X
 import NinetyNine.P7X
-import Test.HUnit
 
 emptyTestCase = TestCase $ assertBool "" True
 
@@ -130,6 +132,25 @@ case22 = TestCase $ assertEqual
   "range"
   [2..7] $
   range 2 7
+
+case23 = TestCase $ do
+  gen <- getStdGen
+  let rs = rndSelect 5 [1..10] gen
+  assertEqual "rndSelect" 5 $ length rs
+  assertEqual "rndSelect" 5 $ length (nub rs)
+  assertBool "rndSelect" $ all (`elem` [1..10]) rs
+
+case24 = TestCase $ do
+  gen <- getStdGen
+  let rs = diffSelect 5 10 gen
+  assertEqual "diffSelect" 5 $ length rs
+  assertEqual "diffSelect" 5 $ length (nub rs)
+  assertBool "diffSelect" $ all (`elem` [1..10]) rs
+
+case25 = TestCase $ do
+  gen <- getStdGen
+  let rs = rndPermutation [1..10] gen
+  assertEqual "rndPermutation" [1..10] $ sort rs
 
 case26 = TestCase $ assertEqual
   "combinations" [
@@ -452,7 +473,7 @@ testCases =
     case06, case07, case08, case09, case10,
     case11, case12, case13, case14, case15,
     case16, case17, case18, case19, case20,
-    case21, case22,
+    case21, case22, case23, case24, case25,
     case26, case27, case28, case29, case30,
     case31, case32, case33, case34, case35,
     case36, case37, case38, case39, case40,

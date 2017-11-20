@@ -4,7 +4,9 @@
 module NinetyNine.P2X where
 
 import Control.Arrow (second)
-import Data.List ((\\), sortOn, tails)
+import Data.List ((\\), nub, sortOn, tails)
+import System.Random (StdGen, randomR, randomRs)
+import NinetyNine.P1X (removeAt)
 
 {-
 21. Insert an element at a given position into a list.
@@ -52,6 +54,19 @@ Prelude System.Random>rnd_select "abcdefgh" 3 >>= putStrLn
 eda
 -}
 
+rndSelect :: Int -> [a] -> StdGen -> [a]
+rndSelect n xs gen = (xs !!) . pred <$> diffSelect n (length xs) gen
+
+rndSelect' :: Int -> [a] -> StdGen -> [a]
+rndSelect' = h []
+  where
+    h rs n xs gen
+      | n <= 0 = rs
+      | otherwise = h (y : rs) (pred n) ys gen'
+      where
+        (i, gen') = randomR (1, length xs) gen
+        (y, ys) = removeAt i xs
+
 {-
 24. Lotto: Draw N different random numbers from the set 1..M.
 
@@ -64,6 +79,9 @@ Prelude System.Random>diff_select 6 49
 Prelude System.Random>[23,1,17,33,21,37]
 -}
 
+diffSelect :: Int -> Int -> StdGen -> [Int]
+diffSelect n m = take n . nub . randomRs (1, m)
+
 {-
 25. Generate a random permutation of the elements of a list.
 
@@ -75,6 +93,9 @@ Example in Haskell:
 Prelude System.Random>rnd_permu "abcdef"
 Prelude System.Random>"badcef"
 -}
+
+rndPermutation :: [a] -> StdGen -> [a]
+rndPermutation xs = rndSelect (length xs) xs
 
 {-
 26. Generate the combinations of K distinct objects

@@ -9,7 +9,7 @@
 
 - [x] 01 to 10: lists
 - [x] 11 to 20: lists, continued
-- [ ] 21 to 28: lists again
+- [x] 21 to 28: lists again
 - [x] 31 to 41: arithmetic
 - [x] 46 to 50: logic and codes
 - [ ] 54 to 60: binary trees
