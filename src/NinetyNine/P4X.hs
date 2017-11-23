@@ -162,7 +162,7 @@ gray :: Integral n => n -> [String]
 gray 0 = [""]
 gray x =
   uncurry (++) . (map ('0' :) *** map ('1' :)) .
-  (id &&& reverse) . gray . subtract 1 $ x
+  (id &&& reverse) . gray . pred $ x
 
 {-
 50. Huffman codes.

@@ -4,7 +4,7 @@
 module NinetyNine.P2X where
 
 import Control.Arrow (second)
-import Data.List ((\\), nub, sortOn, tails)
+import Data.List ((\\), nub, sortOn, tails, genericTake)
 import System.Random (Random, RandomGen, randomR, randomRs)
 import NinetyNine.P1X (removeAt)
 
@@ -36,11 +36,11 @@ Prelude> range 4 9
 -}
 
 range :: (Enum a, Ord a) => a -> a -> [a]
-range x y = h x y []
+range = h []
   where
-    h x y zs
+    h zs x y
       | x > y = zs
-      | otherwise = h x (pred y) (y : zs)
+      | otherwise = h (y : zs) x (pred y)
 
 {-
 23. Extract a given number of randomly selected elements from a list.
@@ -79,8 +79,9 @@ Prelude System.Random>diff_select 6 49
 Prelude System.Random>[23,1,17,33,21,37]
 -}
 
-diffSelect :: (Integral n, Random n, RandomGen g) => Int -> n -> g -> [n]
-diffSelect n m = take n . nub . randomRs (1, m)
+diffSelect :: (Integral n, Random n, RandomGen g) => n -> n -> g -> [n]
+diffSelect n m | n > m = error "diffSelect: n > m"
+diffSelect n m = genericTake n . nub . randomRs (1, m)
 
 {-
 25. Generate a random permutation of the elements of a list.

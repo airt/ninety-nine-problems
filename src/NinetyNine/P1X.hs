@@ -69,10 +69,8 @@ encodeDirect :: Eq a => [a] -> [Elem a]
 encodeDirect = foldr f []
   where
     f x [] = [Single x]
-    f x (Single y : zs)
-      | x == y = Multiple 2 x : zs
-    f x (Multiple n y : zs)
-      | x == y = Multiple (succ n) x : zs
+    f x (Single y : zs) | x == y = Multiple 2 x : zs
+    f x (Multiple n y : zs) | x == y = Multiple (succ n) x : zs
     f x zs = Single x : zs
 
 {-
@@ -156,7 +154,7 @@ Example in Haskell:
 -}
 
 slice :: [a] -> Int -> Int -> [a]
-slice xs i k = take (k - i + 1) . drop (pred i) $ xs
+slice xs i k = take (succ k - i) . drop (pred i) $ xs
 
 {-
 19. Rotate a list N places to the left.
@@ -198,8 +196,8 @@ Example in Haskell:
 -}
 
 removeAt :: Integral n => n -> [a] -> (a, [a])
-removeAt k xs = foldr f (head xs, []) . zip [1..] $ xs
+removeAt n = foldr f (undefined, []) . zip [1..]
   where
     f (i, x) (z, zs)
-      | i == k = (x, zs)
+      | i == n = (x, zs)
       | otherwise = (z, x : zs)

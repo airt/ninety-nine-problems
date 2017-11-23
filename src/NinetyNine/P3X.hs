@@ -99,9 +99,8 @@ Example in Haskell:
 primeFactors :: Integral n => n -> [n]
 primeFactors = reverse . h []
   where
-    h rs x
-      | isPrime x = x : rs
-      | otherwise = let r = factor x in h (r : rs) (div x r)
+    h rs x | isPrime x = x : rs
+    h rs x = let r = factor x in h (r : rs) (div x r)
     factor x = head . filter ((== 0) . mod x) $ [2..x]
 
 {-
@@ -140,7 +139,7 @@ Note that a ** b stands for the b'th power of a.
 totient' :: Integral n => n -> n
 totient' = product . map f . primeFactorsMult
   where
-    f (p, m) = (p - 1) * p ^ (m - 1)
+    f (p, m) = pred p * p ^ pred m
 
 {-
 38. Compare the two methods of calculating Euler's totient function.
@@ -186,7 +185,7 @@ Example in Haskell:
 goldbach :: Integral n => n -> (n, n)
 goldbach x =
   head . filter (isPrime . snd) .
-  map (id &&& (x -)) . primesR 2 . subtract 1 $ x
+  map (id &&& (x -)) . primesR 2 . pred $ x
 
 {-
 41. Given a range of integers by its lower and upper limit,

@@ -86,12 +86,12 @@ whitespace and "comment diagrams" added for clarity and exposition:
 cbalTree :: Integral n => n -> [BTree Char]
 cbalTree 0 = [Empty]
 cbalTree n =
-  if m == 0 then h ts1 ts1 else h ts1 ts2 ++ h ts2 ts1
+  if m == 0 then h xts xts else h xts yts ++ h yts xts
   where
-    h ts1 ts2 = [Branch x l r | l <- ts1, r <- ts2]
+    h lts rts = [Branch x l r | l <- lts, r <- rts]
     (q, m) = divMod (pred n) 2
-    ts1 = cbalTree q
-    ts2 = if m == 0 then ts1 else cbalTree (succ q)
+    xts = cbalTree q
+    yts = if m == 0 then xts else cbalTree (succ q)
     x = 'x'
 
 {-

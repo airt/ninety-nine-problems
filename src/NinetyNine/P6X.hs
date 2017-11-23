@@ -117,18 +117,14 @@ True
 -}
 
 buildCBT :: Integral n => a -> n -> n -> BTree a
-buildCBT x n i =
-  if n - i < 0
-  then Empty
-  else Branch x (buildCBT x n $ i * 2) (buildCBT x n $ i * 2 + 1)
+buildCBT x n i = if n < i then Empty else Branch x (buildCBT x n $ i * 2) (buildCBT x n $ i * 2 + 1)
 
 completeBinaryTree :: Integral n => n -> BTree Char
 completeBinaryTree n = buildCBT 'x' n 1
 
 isomorphism :: BTree a -> BTree b -> Bool
 isomorphism Empty Empty = True
-isomorphism (Branch _ xl xr) (Branch _ yl yr) =
-  isomorphism xl yl && isomorphism xr yr
+isomorphism (Branch _ xl xr) (Branch _ yl yr) = isomorphism xl yl && isomorphism xr yr
 isomorphism _ _ = False
 
 countNodes :: Integral n => BTree a -> n
@@ -277,8 +273,7 @@ True
 treeToString :: BTree Char -> String
 treeToString Empty = ""
 treeToString (Branch x Empty Empty) = [x]
-treeToString (Branch x l r) =
-  x : '(' : treeToString l ++ "," ++ treeToString r ++ ")"
+treeToString (Branch x l r) = x : "(" ++ treeToString l ++ "," ++ treeToString r ++ ")"
 
 stringToTree :: String -> Maybe (BTree Char)
 stringToTree = snd . parseTree
