@@ -4,7 +4,7 @@
 module NinetyNine.P6X where
 
 import Data.Maybe (fromJust, isNothing)
-import NinetyNine.P5X (BTree(..))
+import NinetyNine.P5X (BTree(..), countNodes)
 
 {-
 61. Count the leaves of a binary tree.
@@ -23,7 +23,7 @@ Example in Haskell:
 countLeaves :: Integral n => BTree a -> n
 countLeaves Empty = 0
 countLeaves (Branch _ Empty Empty) = 1
-countLeaves (Branch _ l r) = sum $ countLeaves <$> [l, r]
+countLeaves (Branch _ l r) = countLeaves l + countLeaves r
 
 {-
 61A. Collect the leaves of a binary tree in a list.
@@ -117,7 +117,7 @@ True
 -}
 
 buildCBT :: Integral n => a -> n -> n -> BTree a
-buildCBT x n i = if n < i then Empty else Branch x (buildCBT x n $ i * 2) (buildCBT x n $ i * 2 + 1)
+buildCBT x n i = if n < i then Empty else Branch x (buildCBT x n $ i * 2) (buildCBT x n . succ $ i * 2)
 
 completeBinaryTree :: Integral n => n -> BTree Char
 completeBinaryTree n = buildCBT 'x' n 1
@@ -126,10 +126,6 @@ isomorphism :: BTree a -> BTree b -> Bool
 isomorphism Empty Empty = True
 isomorphism (Branch _ xl xr) (Branch _ yl yr) = isomorphism xl yl && isomorphism xr yr
 isomorphism _ _ = False
-
-countNodes :: Integral n => BTree a -> n
-countNodes Empty = 0
-countNodes (Branch _ l r) = succ . sum . map countNodes $ [l, r]
 
 isCompleteBinaryTree :: BTree a -> Bool
 isCompleteBinaryTree t = isomorphism t . completeBinaryTree . countNodes $ t
@@ -177,14 +173,14 @@ Branch ('n',(8,1)) (Branch ('k',(6,2)) (Branch ('c',(2,3)) ...
 
 -- x: available column index
 -- y: available row index
--- fst tupleReturned: tree with position
--- snd tupleReturned: next available column index
+-- fst result: tree with position
+-- snd result: next available column index
 layout' :: Integral n => (n, n) -> BTree a -> (BTree (a, (n, n)), n)
 layout' (x, _) Empty = (Empty, x)
-layout' (x, y) (Branch v l r) = (Branch (v, (nl, y)) ll lr, nr)
+layout' (x, y) (Branch v l r) = (Branch (v, (ln, y)) ll rl, rn)
   where
-    (ll, nl) = layout' (x, succ y) l
-    (lr, nr) = layout' (succ nl, succ y) r
+    (ll, ln) = layout' (x, succ y) l
+    (rl, rn) = layout' (succ ln, succ y) r
 
 layout :: Integral n => BTree a -> BTree (a, (n, n))
 layout = fst . layout' (1, 1)

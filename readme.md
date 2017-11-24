@@ -12,7 +12,7 @@
 - [x] 21 to 28: lists again
 - [x] 31 to 41: arithmetic
 - [x] 46 to 50: logic and codes
-- [ ] 54 to 60: binary trees
+- [x] 54 to 60: binary trees
 - [ ] 61 to 69: binary trees, continued
 - [x] 70 to 73: multiway trees
 - [ ] 80 to 89: graphs

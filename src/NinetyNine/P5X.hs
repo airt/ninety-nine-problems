@@ -3,8 +3,11 @@
 
 module NinetyNine.P5X where
 
+import Data.List (findIndex, genericIndex)
+import Data.Maybe (fromJust)
+
 data BTree a = Empty | Branch a (BTree a) (BTree a)
-  deriving (Eq, Read, Show)
+  deriving (Eq, Ord, Show)
 
 {-
 54A. Check whether a given term represents a binary tree.
@@ -43,7 +46,7 @@ etc......No
 
 Example in Haskell,
 whitespace and "comment diagrams" added for clarity and exposition:
-*Main> cbalTree 4
+*Main> cbalTrees 4
 [ -- permutation 1
   --     x
   --    / \
@@ -83,16 +86,11 @@ whitespace and "comment diagrams" added for clarity and exposition:
 ]
 -}
 
-cbalTree :: Integral n => n -> [BTree Char]
-cbalTree 0 = [Empty]
-cbalTree n =
-  if m == 0 then h xts xts else h xts yts ++ h yts xts
+cbalTrees :: Integral n => a -> n -> [BTree a]
+cbalTrees _ 0 = [Empty]
+cbalTrees x n = [Branch x l r | i <- [d .. d + m], l <- cbalTrees x i, r <- cbalTrees x $ pred n - i]
   where
-    h lts rts = [Branch x l r | l <- lts, r <- rts]
-    (q, m) = divMod (pred n) 2
-    xts = cbalTree q
-    yts = if m == 0 then xts else cbalTree (succ q)
-    x = 'x'
+    (d, m) = divMod (pred n) 2
 
 {-
 56. Symmetric binary trees.
@@ -112,14 +110,12 @@ False
 True
 -}
 
-mirror :: BTree a -> BTree a -> Bool
-mirror Empty Empty = True
-mirror (Branch _ xl xr) (Branch _ yl yr) = mirror xl yr && mirror xr yl
-mirror _ _ = False
-
 symmetric :: BTree a -> Bool
-symmetric Empty = True
-symmetric (Branch _ l r) = mirror l r
+symmetric t = h t t
+  where
+    h Empty Empty = True
+    h (Branch _ lx rx) (Branch _ ly ry) = h lx ry && h rx ly
+    h _ _ = False
 
 {-
 57. Binary search trees (dictionaries).
@@ -149,15 +145,13 @@ True
 True
 -}
 
-add :: Ord a => a -> BTree a -> BTree a
-add x Empty = Branch x Empty Empty
-add x t@(Branch y l r)
-  | x < y = Branch y (add x l) r
-  | x > y = Branch y l (add x r)
-  | otherwise = t
-
 construct :: Ord a => [a] -> BTree a
-construct = foldr add Empty . reverse
+construct = foldl (flip add) Empty
+  where
+    add x Empty = Branch x Empty Empty
+    add x (Branch y l r) | x < y = Branch y (add x l) r
+    add x (Branch y l r) | x > y = Branch y l (add x r)
+    add _ t = t
 
 {-
 58. Generate-and-test paradigm.
@@ -179,8 +173,8 @@ Example in Haskell:
 ]
 -}
 
-symCbalTrees :: Integral n => n -> [BTree Char]
-symCbalTrees = filter symmetric . cbalTree
+symCbalTrees :: Integral n => a -> n -> [BTree a]
+symCbalTrees x = filter symmetric . cbalTrees x
 
 {-
 59. Construct height-balanced binary trees.
@@ -201,7 +195,7 @@ T = t(x, t(x, t(x, nil, nil), t(x, nil, nil)),
 etc......No
 
 Example in Haskell:
-*Main> take 4 $ hbalTree 'x' 3
+*Main> take 4 $ hbalTreesH 'x' 3
 [ Branch 'x' (Branch 'x' Empty Empty)
              (Branch 'x' Empty (Branch 'x' Empty Empty))
 , Branch 'x' (Branch 'x' Empty Empty)
@@ -212,6 +206,21 @@ Example in Haskell:
              (Branch 'x' Empty Empty)
 ]
 -}
+
+hbalTreesH :: Integral n => a -> n -> [BTree a]
+hbalTreesH _ 0 = [Empty]
+hbalTreesH x 1 = [Branch x Empty Empty]
+hbalTreesH x h = do
+  (lh, rh) <- [(pred . pred, pred), (pred, pred), (pred, pred . pred)]
+  l <- hbalTreesH x $ lh h
+  r <- hbalTreesH x $ rh h
+  return $ Branch x l r
+
+hbalTreesH' :: Integral n => a -> n -> [BTree a]
+hbalTreesH' x = genericIndex tss
+  where
+    tss = [Empty] : [Branch x Empty Empty] : zipWith f tss (tail tss)
+    f xs ys = [Branch x l r | (ls, rs) <- [(xs, ys), (ys, ys), (ys, xs)], l <- ls, r <- rs]
 
 {-
 60. Construct height-balanced binary trees with a given number of nodes.
@@ -237,9 +246,9 @@ Example in Prolog:
 C = 1553
 
 Example in Haskell:
-*Main> length $ hbalTreeNodes 'x' 15
+*Main> length $ hbalTrees 'x' 15
 1553
-*Main> map (hbalTreeNodes 'x') [0..3]
+*Main> map (hbalTrees 'x') [0..3]
 [ [ Empty ]
 , [ Branch 'x' Empty Empty ]
 , [ Branch 'x' Empty (Branch 'x' Empty Empty)
@@ -247,3 +256,27 @@ Example in Haskell:
 , [ Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty) ]
 ]
 -}
+
+maxNodesByHeight :: Integral n => n -> n
+maxNodesByHeight = pred . (2 ^)
+
+minNodesByHeight :: Integral n => n -> n
+minNodesByHeight = genericIndex minNodesSequence
+
+maxHeightByNodes :: Integral n => n -> n
+maxHeightByNodes = fromIntegral . pred . fromJust . flip findIndex minNodesSequence . (<)
+
+minHeightByNodes :: Integral n => n -> n
+minHeightByNodes = ceiling . logBase 2 . fromIntegral . succ
+
+minNodesSequence :: Integral n => [n]
+minNodesSequence = map fromIntegral ns
+  where
+    ns = 0 : 1 : zipWith ((+) . succ) ns (tail ns) :: [Integer]
+
+countNodes :: Integral n => BTree a -> n
+countNodes Empty = 0
+countNodes (Branch _ l r) = succ $ countNodes l + countNodes r
+
+hbalTrees :: Integral n => a -> n -> [BTree a]
+hbalTrees x n = [t | h <- [minHeightByNodes n .. maxHeightByNodes n], t <- hbalTreesH x h, countNodes t == n]

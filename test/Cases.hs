@@ -295,8 +295,10 @@ case52 = emptyTestCase
 
 case53 = emptyTestCase
 
+case54 = emptyTestCase
+
 case55 = TestCase $ assertEqual
-  "cbalTree" [
+  "cbalTrees" [
     Branch 'x'
       (Branch 'x' Empty Empty)
       (Branch 'x'
@@ -318,11 +320,13 @@ case55 = TestCase $ assertEqual
         Empty)
       (Branch 'x' Empty Empty)
   ] $
-  cbalTree 4
+  cbalTrees 'x' 4
 
 case56 = TestCase $ assertEqual
-  "symmetric"
-  (True, False) (
+  "symmetric" (
+    True,
+    False
+  ) (
     symmetric (
       Branch 'x'
         (Branch 'x' Empty Empty)
@@ -369,7 +373,41 @@ case58 = TestCase $ assertEqual
         Empty
         (Branch 'x' Empty Empty))
   ] $
-  symCbalTrees 5
+  symCbalTrees 'x' 5
+
+case59 = TestCase $ assertEqual
+  "hbalTreesH" [
+    Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' (Branch 'x' Empty Empty) Empty),
+    Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' Empty (Branch 'x' Empty Empty)) (Branch 'x' Empty Empty),
+    Branch 'x' (Branch 'x' Empty (Branch 'x' Empty Empty)) (Branch 'x' Empty (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' Empty (Branch 'x' Empty Empty)) (Branch 'x' (Branch 'x' Empty Empty) Empty),
+    Branch 'x' (Branch 'x' Empty (Branch 'x' Empty Empty)) (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty) (Branch 'x' Empty Empty),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty) (Branch 'x' Empty (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty) (Branch 'x' (Branch 'x' Empty Empty) Empty),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) Empty) (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)) (Branch 'x' Empty Empty),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)) (Branch 'x' Empty (Branch 'x' Empty Empty)),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)) (Branch 'x' (Branch 'x' Empty Empty) Empty),
+    Branch 'x' (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)) (Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty))
+  ] $
+  sort $ hbalTreesH 'x' 3
+
+case60 = TestCase $ assertEqual
+  "hbalTrees" (
+    [
+      [Empty],
+      [Branch 'x' Empty Empty],
+      [Branch 'x' Empty (Branch 'x' Empty Empty), Branch 'x' (Branch 'x' Empty Empty) Empty],
+      [Branch 'x' (Branch 'x' Empty Empty) (Branch 'x' Empty Empty)]
+    ],
+    1553
+  ) (
+    map (hbalTrees 'x') [0..3],
+    length $ hbalTrees 'x' 15
+  )
 
 bTree5 =
   Branch 'a'
@@ -479,8 +517,8 @@ testcases =
     case36, case37, case38, case39, case40,
     case41, case42, case43, case44, case45,
     case46, case47, case48, case49, case50,
-    case51, case52, case53, case55,
-    case56, case57, case58,
+    case51, case52, case53, case54, case55,
+    case56, case57, case58, case59, case60,
     case61, case62, case63, case64,
     case67, case68, case69, case70,
     case71, case72, case73, case74, case75,
