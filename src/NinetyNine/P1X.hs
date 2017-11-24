@@ -23,7 +23,7 @@ P11> encodeModified "aaaabccaadeeee"
 -}
 
 data Elem a = Single a | Multiple Int a
-  deriving (Eq, Read, Show)
+  deriving (Eq, Ord, Show)
 
 encodeModified :: Eq a => [a] -> [Elem a]
 encodeModified = map f . encode

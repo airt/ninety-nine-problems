@@ -6,7 +6,7 @@ module NinetyNine.P7X where
 import Data.Maybe (fromJust, isNothing)
 
 data MTree a = MTree a [MTree a]
-  deriving (Eq, Read, Show)
+  deriving (Eq, Ord, Show)
 
 {-
 70B. Check whether a given term represents a multiway tree.

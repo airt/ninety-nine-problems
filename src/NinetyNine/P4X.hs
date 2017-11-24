@@ -181,7 +181,7 @@ Example in Haskell:
 -}
 
 data HTree a = HLeaf a | HBranch (HTree a) (HTree a)
-  deriving (Eq, Read, Show)
+  deriving (Eq, Ord, Show)
 
 huffman :: (Ord a, Ord n, Num n) => [(a, n)] -> [(a, String)]
 huffman = sortOn fst . serialize . htree . leaves

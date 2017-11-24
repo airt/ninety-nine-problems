@@ -119,7 +119,7 @@ We have to define a new data type, because lists in Haskell are homogeneous.
 -}
 
 data NestedList a = Elem a | List [NestedList a]
-  deriving (Eq, Read, Show)
+  deriving (Eq, Ord, Show)
 
 flatten :: NestedList a -> [a]
 flatten (Elem x) = [x]
