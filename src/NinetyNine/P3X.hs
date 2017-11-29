@@ -40,10 +40,10 @@ Example in Haskell:
 -}
 
 myGCD :: Integral n => n -> n -> n
-myGCD x y | x < 0 = myGCD (abs x) y
-myGCD x y | y < 0 = myGCD x (abs y)
-myGCD 0 y = y
-myGCD x y = myGCD (mod y x) x
+myGCD x y = h (abs x) (abs y)
+  where
+    h 0 y = y
+    h x y = h (mod y x) x
 
 {-
 33. Determine whether two positive integer numbers are coprime.
@@ -99,8 +99,9 @@ Example in Haskell:
 primeFactors :: Integral n => n -> [n]
 primeFactors = reverse . h []
   where
-    h rs x | isPrime x = x : rs
-    h rs x = let r = factor x in h (r : rs) (div x r)
+    h rs x
+      | isPrime x = x : rs
+      | otherwise = let r = factor x in h (r : rs) (div x r)
     factor x = head . filter ((== 0) . mod x) $ [2..x]
 
 {-

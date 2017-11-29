@@ -88,9 +88,10 @@ whitespace and "comment diagrams" added for clarity and exposition:
 
 cbalTrees :: Integral n => a -> n -> [BTree a]
 cbalTrees _ 0 = [Empty]
-cbalTrees x n = [Branch x l r | i <- [d .. d + m], l <- cbalTrees x i, r <- cbalTrees x $ pred n - i]
+cbalTrees x n = f =<< [d .. d + m]
   where
     (d, m) = divMod (pred n) 2
+    f i = Branch x <$> cbalTrees x i <*> cbalTrees x (pred n - i)
 
 {-
 56. Symmetric binary trees.
@@ -210,17 +211,17 @@ Example in Haskell:
 hbalTreesH :: Integral n => a -> n -> [BTree a]
 hbalTreesH _ 0 = [Empty]
 hbalTreesH x 1 = [Branch x Empty Empty]
-hbalTreesH x h = do
-  (lh, rh) <- [(pred . pred, pred), (pred, pred), (pred, pred . pred)]
-  l <- hbalTreesH x $ lh h
-  r <- hbalTreesH x $ rh h
-  return $ Branch x l r
+hbalTreesH x h = f =<< lrhs
+  where
+    lrhs = [(pred . pred, pred), (pred, pred), (pred, pred . pred)]
+    f (lh, rh) = Branch x <$> hbalTreesH x (lh h) <*> hbalTreesH x (rh h)
 
 hbalTreesH' :: Integral n => a -> n -> [BTree a]
 hbalTreesH' x = genericIndex tss
   where
-    tss = [Empty] : [Branch x Empty Empty] : zipWith f tss (tail tss)
-    f xs ys = [Branch x l r | (ls, rs) <- [(xs, ys), (ys, ys), (ys, xs)], l <- ls, r <- rs]
+    tss = [Empty] : [Branch x Empty Empty] : zipWith h tss (tail tss)
+    h xs ys = f =<< [(xs, ys), (ys, ys), (ys, xs)]
+    f (ls, rs) = Branch x <$> ls <*> rs
 
 {-
 60. Construct height-balanced binary trees with a given number of nodes.
@@ -270,7 +271,7 @@ minHeightByNodes :: Integral n => n -> n
 minHeightByNodes = ceiling . logBase 2 . fromIntegral . succ
 
 minNodesSequence :: Integral n => [n]
-minNodesSequence = map fromIntegral ns
+minNodesSequence = fromIntegral <$> ns
   where
     ns = 0 : 1 : zipWith ((+) . succ) ns (tail ns) :: [Integer]
 

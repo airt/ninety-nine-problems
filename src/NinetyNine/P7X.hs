@@ -3,8 +3,6 @@
 
 module NinetyNine.P7X where
 
-import Data.Maybe (fromJust, isNothing)
-
 data MTree a = MTree a [MTree a]
   deriving (Eq, Ord, Show)
 
@@ -81,10 +79,7 @@ stringToMtree :: String -> Maybe (MTree Char)
 stringToMtree = snd . parseTree
 
 parseTree :: String -> (String, Maybe (MTree Char))
-parseTree (x : s) =
-  if any isNothing ts
-  then (rs, Nothing)
-  else (rs, Just $ MTree x $ map fromJust ts)
+parseTree (x : s) = (rs, MTree x <$> sequence ts)
   where
     (rs, ts) = parseTrees s
 parseTree _ = ("", Nothing)
@@ -111,7 +106,7 @@ Tree> ipl tree4
 -}
 
 ipl :: Integral n => MTree a -> n
-ipl (MTree _ ts) = sum . map (\t -> ipl t + nnodes t) $ ts
+ipl (MTree _ ts) = sum . map ((+) <$> ipl <*> nnodes) $ ts
 
 {-
 72. Construct the bottom-up order sequence of the tree nodes.
@@ -169,7 +164,5 @@ in a way that the inverse conversion is also possible.
 -}
 
 sexp :: MTree Char -> String
-sexp (MTree x ts) =
-  if null ts
-  then [x]
-  else '(' : x : (((' ' :) . sexp) =<< ts) ++ ")"
+sexp (MTree x []) = [x]
+sexp (MTree x ts) = '(' : x : (((' ' :) . sexp) =<< ts) ++ ")"

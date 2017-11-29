@@ -3,7 +3,7 @@
 
 module NinetyNine.P4X where
 
-import Control.Arrow ((&&&), (***), first, second)
+import Control.Arrow (first, second)
 import Data.Function (on)
 import Data.List (insertBy, sortOn)
 
@@ -133,11 +133,10 @@ genBools :: Integral n => n -> [[Bool]]
 genBools = map reverse . h
   where
     h 0 = [[]]
-    h n = f =<< h (pred n)
-    f xs = ($ xs) <$> [(True :), (False :)]
+    h n = sequence [(True :), (False :)] =<< h (pred n)
 
 tablen :: Integral n => n -> ([Bool] -> Bool) -> [[Bool]]
-tablen n f = (\xs -> xs ++ [f xs]) <$> genBools n
+tablen n f = ((++) <$> id <*> (return . f)) <$> genBools n
 
 {-
 49. Gray codes.
@@ -160,9 +159,7 @@ P49> gray 3
 
 gray :: Integral n => n -> [String]
 gray 0 = [""]
-gray x =
-  uncurry (++) . (map ('0' :) *** map ('1' :)) .
-  (id &&& reverse) . gray . pred $ x
+gray x = ((++) <$> map ('0' :) <*> (map ('1' :) . reverse)) . gray . pred $ x
 
 {-
 50. Huffman codes.
@@ -197,7 +194,7 @@ huffman = sortOn fst . serialize . htree . leaves
     merge (t1, w1) (t2, w2) = (HBranch t1 t2, w1 + w2)
 
     insertOn :: Ord b => (a -> b) -> a -> [a] -> [a]
-    insertOn = insertBy . (compare `on`)
+    insertOn = insertBy . on compare
 
     serialize :: HTree a -> [(a, String)]
     serialize (HLeaf x) = [(x, [])]

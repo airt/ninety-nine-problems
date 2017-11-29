@@ -3,7 +3,6 @@
 
 module NinetyNine.P6X where
 
-import Data.Maybe (fromJust, isNothing)
 import NinetyNine.P5X (BTree(..), countNodes)
 
 {-
@@ -117,7 +116,8 @@ True
 -}
 
 buildCBT :: Integral n => a -> n -> n -> BTree a
-buildCBT x n i = if n < i then Empty else Branch x (buildCBT x n $ i * 2) (buildCBT x n . succ $ i * 2)
+buildCBT _ n i | n < i = Empty
+buildCBT x n i = Branch x (buildCBT x n $ i * 2) (buildCBT x n . succ $ i * 2)
 
 completeBinaryTree :: Integral n => n -> BTree Char
 completeBinaryTree n = buildCBT 'x' n 1
@@ -279,13 +279,10 @@ parseTree (',' : s) = (s, Just Empty)
 parseTree (')' : s) = (s, Just Empty)
 parseTree (x : ',' : s) = (s, Just $ Branch x Empty Empty)
 parseTree (x : ')' : s) = (s, Just $ Branch x Empty Empty)
-parseTree (x : '(' : s) =
-  if any isNothing [l, r]
-  then (tail sr, Nothing)
-  else (tail sr, Just $ Branch x (fromJust l) (fromJust r))
+parseTree (x : '(' : s) = (tail rs, Branch x <$> lm <*> rm)
   where
-    (sl, l) = parseTree s
-    (sr, r) = parseTree sl
+    (ls, lm) = parseTree s
+    (rs, rm) = parseTree ls
 parseTree _ = ("", Nothing)
 
 {-
@@ -351,11 +348,8 @@ ds2tree = snd . parseDs
 
 parseDs :: String -> (String, Maybe (BTree Char))
 parseDs ('.' : s) = (s, Just Empty)
-parseDs (x : s) =
-  if any isNothing [l, r]
-  then (sr, Nothing)
-  else (sr, Just $ Branch x (fromJust l) (fromJust r))
+parseDs (x : s) = (rs, Branch x <$> lm <*> rm)
   where
-    (sl, l) = parseDs s
-    (sr, r) = parseDs sl
+    (ls, lm) = parseDs s
+    (rs, rm) = parseDs ls
 parseDs _ = ("", Nothing)
