@@ -15,7 +15,7 @@ import NinetyNine.P5X
 import NinetyNine.P6X
 import NinetyNine.P7X
 
-emptyTestCase = testCase "empty" $ True @? ""
+emptyTestCase = testCase "empty" $ True @? []
 
 case01 = testCase "myLast" $
   9
@@ -114,12 +114,12 @@ case17 = testCase "split" $
 case18 = testCase "slice" $
   "cdefg"
   @=?
-  slice ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'k'] 3 7
+  slice "abcdefghik" 3 7
 
 case19 = testCase "rotate" $
   "ghabcdef"
   @=?
-  rotate ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] (-2)
+  rotate "abcdefgh" (-2)
 
 case20 = testCase "removeAt" $
   ('b', "acd")
@@ -140,13 +140,13 @@ case23 = testCase "rndSelect" $ do
   rs <- rndSelect 5 [1..10] <$> getStdGen
   5 @=? length rs
   5 @=? length (nub rs)
-  all (`elem` [1..10]) rs @? ""
+  all (`elem` [1..10]) rs @? []
 
 case24 = testCase "diffSelect" $ do
   rs <- diffSelect 6 10 <$> getStdGen :: IO [Int]
   6 @=? length rs
   6 @=? length (nub rs)
-  all (`elem` [1..10]) rs @? ""
+  all (`elem` [1..10]) rs @? []
 
 case25 = testCase "rndPermutation" $ do
   rs <- rndPermutation [1..10] <$> getStdGen
@@ -420,7 +420,7 @@ case60 = testCase "hbalTrees" $
   )
   @=?
   (
-    map (hbalTrees 'x') [0..3],
+    hbalTrees 'x' <$> [0..3],
     length $ hbalTrees 'x' 15
   )
 
@@ -434,12 +434,12 @@ bTree5 =
       Empty)
 
 case61 = testCase "countLeaves, leaves" $
-  (2, ['d', 'e'])
+  (2, "de")
   @=?
   (countLeaves bTree5, leaves bTree5)
 
 case62 = testCase "internals, atLevel" $
-  (['a', 'b', 'c'], ['b', 'c'])
+  ("abc", "bc")
   @=?
   (internals bTree5, atLevel bTree5 2)
 
