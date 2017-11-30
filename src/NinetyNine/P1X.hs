@@ -196,8 +196,9 @@ Example in Haskell:
 -}
 
 removeAt :: Integral n => n -> [a] -> (a, [a])
-removeAt n = foldr f (undefined, []) . zip [1..]
+removeAt n = foldr f (e, []) . zip [1..]
   where
+    e = error "removeAt: index out of bounds"
     f (i, x) (z, zs)
       | i == n = (x, zs)
       | otherwise = (z, x : zs)
