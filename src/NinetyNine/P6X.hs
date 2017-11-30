@@ -273,17 +273,17 @@ treeToString (Branch x l r) = x : "(" ++ treeToString l ++ "," ++ treeToString r
 
 stringToTree :: String -> Maybe (BTree Char)
 stringToTree = snd . parseTree
-
-parseTree :: String -> (String, Maybe (BTree Char))
-parseTree (',' : s) = (s, Just Empty)
-parseTree (')' : s) = (s, Just Empty)
-parseTree (x : ',' : s) = (s, Just $ Branch x Empty Empty)
-parseTree (x : ')' : s) = (s, Just $ Branch x Empty Empty)
-parseTree (x : '(' : s) = (tail rs, Branch x <$> lm <*> rm)
   where
-    (ls, lm) = parseTree s
-    (rs, rm) = parseTree ls
-parseTree _ = ("", Nothing)
+    parseTree :: String -> (String, Maybe (BTree Char))
+    parseTree (',' : s) = (s, Just Empty)
+    parseTree (')' : s) = (s, Just Empty)
+    parseTree (x : ',' : s) = (s, Just $ Branch x Empty Empty)
+    parseTree (x : ')' : s) = (s, Just $ Branch x Empty Empty)
+    parseTree (x : '(' : s) = (tail rs, Branch x <$> lm <*> rm)
+      where
+        (ls, lm) = parseTree s
+        (rs, rm) = parseTree ls
+    parseTree _ = ("", Nothing)
 
 {-
 68. Preorder and inorder sequences of binary trees. We consider binary trees

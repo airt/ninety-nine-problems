@@ -77,19 +77,19 @@ mtreeToString (MTree x ts) = x : (mtreeToString =<< ts) ++ "^"
 
 stringToMtree :: String -> Maybe (MTree Char)
 stringToMtree = snd . parseTree
-
-parseTree :: String -> (String, Maybe (MTree Char))
-parseTree (x : s) = (rs, MTree x <$> sequence ts)
   where
-    (rs, ts) = parseTrees s
-parseTree _ = ("", Nothing)
+    parseTree :: String -> (String, Maybe (MTree Char))
+    parseTree (x : s) = (rs, MTree x <$> sequence ts)
+      where
+        (rs, ts) = parseTrees s
+    parseTree _ = ("", Nothing)
 
-parseTrees :: String -> (String, [Maybe (MTree Char)])
-parseTrees ('^' : s) = (s, [])
-parseTrees s = (ors, t : ots)
-  where
-    (rs, t) = parseTree s
-    (ors, ots) = parseTrees rs
+    parseTrees :: String -> (String, [Maybe (MTree Char)])
+    parseTrees ('^' : s) = (s, [])
+    parseTrees s = (ors, t : ots)
+      where
+        (rs, t) = parseTree s
+        (ors, ots) = parseTrees rs
 
 {-
 71. Determine the internal path length of a tree.

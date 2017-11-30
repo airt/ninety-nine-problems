@@ -6,14 +6,7 @@ import Data.List (nub, sort)
 import System.Random (getStdGen)
 import Test.Tasty
 import Test.Tasty.HUnit
-import NinetyNine.P0X
-import NinetyNine.P1X
-import NinetyNine.P2X
-import NinetyNine.P3X
-import NinetyNine.P4X
-import NinetyNine.P5X
-import NinetyNine.P6X
-import NinetyNine.P7X
+import NinetyNine
 
 emptyTestCase = testCase "empty" $ True @? []
 

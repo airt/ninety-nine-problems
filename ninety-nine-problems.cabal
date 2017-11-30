@@ -14,7 +14,8 @@ library
   hs-source-dirs:     src
   default-language:   Haskell2010
   build-depends:      base, random
-  exposed-modules:    NinetyNine.P0X,
+  exposed-modules:    NinetyNine
+  other-modules:      NinetyNine.P0X,
                       NinetyNine.P1X,
                       NinetyNine.P2X,
                       NinetyNine.P3X,
