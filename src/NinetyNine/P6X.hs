@@ -3,6 +3,7 @@
 
 module NinetyNine.P6X where
 
+import Data.Foldable (toList)
 import NinetyNine.P5X (BTree(..), countNodes)
 
 {-
@@ -115,12 +116,12 @@ Main> isCompleteBinaryTree $ Branch 'x' (Branch 'x' Empty Empty)
 True
 -}
 
-buildCBT :: Integral n => a -> n -> n -> BTree a
-buildCBT _ n i | n < i = Empty
-buildCBT x n i = Branch x (buildCBT x n $ i * 2) (buildCBT x n . succ $ i * 2)
-
-completeBinaryTree :: Integral n => n -> BTree Char
-completeBinaryTree n = buildCBT 'x' n 1
+completeBinaryTree :: Integral n => a -> n -> BTree a
+completeBinaryTree x n = h 1
+  where
+    h i
+      | n < i = Empty
+      | otherwise = Branch x (h $ i * 2) (h . succ $ i * 2)
 
 isomorphism :: BTree a -> BTree b -> Bool
 isomorphism Empty Empty = True
@@ -128,7 +129,7 @@ isomorphism (Branch _ xl xr) (Branch _ yl yr) = isomorphism xl yl && isomorphism
 isomorphism _ _ = False
 
 isCompleteBinaryTree :: BTree a -> Bool
-isCompleteBinaryTree t = isomorphism t . completeBinaryTree . countNodes $ t
+isCompleteBinaryTree t = isomorphism t . completeBinaryTree Nothing . countNodes $ t
 
 {-
 64. Given a binary tree as the usual Prolog term t(X,L,R) (or nil).
@@ -171,19 +172,15 @@ Example in Haskell:
 Branch ('n',(8,1)) (Branch ('k',(6,2)) (Branch ('c',(2,3)) ...
 -}
 
--- x: available column index
--- y: available row index
--- fst result: tree with position
--- snd result: next available column index
-layout' :: Integral n => (n, n) -> BTree a -> (BTree (a, (n, n)), n)
-layout' (x, _) Empty = (Empty, x)
-layout' (x, y) (Branch v l r) = (Branch (v, (ln, y)) ll rl, rn)
-  where
-    (ll, ln) = layout' (x, succ y) l
-    (rl, rn) = layout' (succ ln, succ y) r
-
 layout :: Integral n => BTree a -> BTree (a, (n, n))
-layout = fst . layout' (1, 1)
+layout = fst . h (1, 1)
+  where
+    -- -> (tree, next-column)
+    h (x, _) Empty = (Empty, x)
+    h (x, y) (Branch v l r) = (Branch (v, (ln, y)) ll rl, rn)
+      where
+        (ll, ln) = h (x, succ y) l
+        (rl, rn) = h (succ ln, succ y) r
 
 {-
 65. An alternative layout method is depicted in the illustration below:
@@ -310,13 +307,29 @@ Branch 'a' (Branch 'b' (Branch 'd' Empty Empty) (Branch 'e' Empty Empty))
            (Branch 'c' Empty (Branch 'f' (Branch 'g' Empty Empty) Empty))
 -}
 
-preorder :: BTree Char -> String
-preorder Empty = ""
-preorder (Branch x l r) = x : preorder l ++ preorder r
+newtype PreOrder a = PreOrder { getPreOrder :: BTree a }
 
-inorder :: BTree Char -> String
-inorder Empty = ""
-inorder (Branch x l r) = inorder l ++ [x] ++ inorder r
+newtype InOrder a = InOrder { getInOrder :: BTree a }
+
+instance Foldable PreOrder where
+  foldMap _ (PreOrder Empty) = mempty
+  foldMap f (PreOrder (Branch x l r)) =
+    f x `mappend`
+    foldMap f (PreOrder l) `mappend`
+    foldMap f (PreOrder r)
+
+instance Foldable InOrder where
+  foldMap _ (InOrder Empty) = mempty
+  foldMap f (InOrder (Branch x l r)) =
+    foldMap f (InOrder l) `mappend`
+    f x `mappend`
+    foldMap f (InOrder r)
+
+preorder :: BTree a -> [a]
+preorder = toList . PreOrder
+
+inorder :: BTree a -> [a]
+inorder = toList . InOrder
 
 {-
 69. Dotstring representation of binary trees.

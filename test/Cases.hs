@@ -445,8 +445,8 @@ case63 = testCase "completeBinaryTree, isCompleteBinaryTree" $
   )
   @=?
   (
-    completeBinaryTree 4,
-    isCompleteBinaryTree . completeBinaryTree $ 4
+    completeBinaryTree 'x' 4,
+    isCompleteBinaryTree . completeBinaryTree 'x' $ 4
   )
 
 case64 = testCase "layout" $
