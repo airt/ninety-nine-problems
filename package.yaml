@@ -1,0 +1,32 @@
+name: ninety-nine-problems
+version: 0.0.1
+synopsis: ..
+maintainer: airt <airtial@gmail.com>
+license: MIT
+github: airt/ninety-nine-problems
+
+dependencies:
+  - base
+  - mtl
+  - random
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - NinetyNine
+    - NinetyNine.Parser
+
+tests:
+  test:
+    main: Test.hs
+    source-dirs: test
+    dependencies:
+      - ninety-nine-problems
+      - tasty
+      - tasty-hunit
+  spec:
+    main: Spec.hs
+    source-dirs: test
+    dependencies:
+      - ninety-nine-problems
+      - hspec
